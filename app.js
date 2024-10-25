@@ -1,4 +1,4 @@
-// Configuração inicial do tabuleiro
+
 const board = [
   ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
   ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
@@ -12,9 +12,9 @@ const board = [
 
 let selectedPiece = null;
 let selectedPosition = null;
-let currentTurn = 'white'; // O jogador branco começa
+let currentTurn = 'white'; 
 
-// Função para renderizar o tabuleiro
+
 function createBoard() {
   const chessBoard = document.getElementById('board');
   chessBoard.innerHTML = '';
@@ -36,13 +36,13 @@ function createBoard() {
   }
 }
 
-// Função para alternar turnos após cada jogada válida
+
 function toggleTurn() {
   currentTurn = currentTurn === 'white' ? 'black' : 'white';
   document.getElementById('turn-info').textContent = `Turno: ${currentTurn === 'white' ? 'Jogador Branco' : 'Jogador Preto'}`;
 }
 
-// Função de clique na célula do tabuleiro
+
 function handleSquareClick(row, col) {
   const piece = board[row][col];
   const pieceColor = piece && piece === piece.toUpperCase() ? 'white' : 'black';
@@ -66,38 +66,38 @@ function movePiece(piece, from, toRow, toCol) {
   const valid = isValidMove(piece, from, toRow, toCol);
   
   if (valid) {
-    // Move a peça no tabuleiro
+    
     board[from.row][from.col] = '';
     board[toRow][toCol] = piece;
 
-    // Limpa a seleção
+    
     selectedPiece = null;
     selectedPosition = null;
     
-    // Atualiza o tabuleiro visual
+    
     createBoard();
 
-    // Alterna o turno para o próximo jogador
+    
     currentTurn = currentTurn === 'white' ? 'black' : 'white';
     document.getElementById('turn-info').textContent = `Turno: ${currentTurn === 'white' ? 'Jogador Branco' : 'Jogador Preto'}`;
     
-    // Atualiza a mensagem de movimento
+    
     document.getElementById('move-info').textContent = `Peça movida para ${positionToString(toRow, toCol)}`;
   } else {
-    // Caso movimento inválido, exibe mensagem e limpa a seleção para escolher outra peça
+    
     document.getElementById('move-info').textContent = 'Movimento inválido. Tente novamente.';
     selectedPiece = null;
     selectedPosition = null;
-    removeHighlight();  // Remove o destaque anterior
+    removeHighlight();  
   }
 }
 
 
-// Função para verificar se o movimento é válido
+
 function isValidMove(piece, from, toRow, toCol) {
   const targetPiece = board[toRow][toCol];
   
-  // Impede que o jogador capture suas próprias peças
+  
   if (targetPiece && ((piece === piece.toUpperCase() && targetPiece === targetPiece.toUpperCase()) || 
                       (piece === piece.toLowerCase() && targetPiece === targetPiece.toLowerCase()))) {
     return false;
@@ -115,7 +115,7 @@ function isValidMove(piece, from, toRow, toCol) {
 }
 
 
-// Funções para destacar as posições válidas para movimentos e capturas
+
 function showPossibleMoves(piece, row, col) {
   removeHighlight();
   for (let r = 0; r < 8; r++) {
@@ -128,7 +128,7 @@ function showPossibleMoves(piece, row, col) {
   }
 }
 
-// Função para limpar o destaque após o movimento
+
 function removeHighlight() {
   const highlightedSquares = document.querySelectorAll('.highlight, .capture-highlight');
   highlightedSquares.forEach(square => {
@@ -136,20 +136,20 @@ function removeHighlight() {
   });
 }
 
-// Função para capturar peças inimigas
+
 function canCaptureEnemyPiece(piece, toRow, toCol) {
   const targetPiece = board[toRow][toCol];
   return targetPiece && targetPiece !== '' && ((piece === piece.toLowerCase() && targetPiece === targetPiece.toUpperCase()) ||
           (piece === piece.toUpperCase() && targetPiece === targetPiece.toLowerCase()));
 }
 
-// Função para converter coordenadas para A1, B2, etc.
+
 function positionToString(row, col) {
   const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   return `${letters[col]}${8 - row}`;
 }
 
-// Funções de verificação para cada tipo de peça
+
 function isValidPawnMove(piece, from, toRow, toCol) {
   const direction = piece === 'P' ? -1 : 1;
   const startRow = piece === 'P' ? 6 : 1;
@@ -186,7 +186,7 @@ function isValidKingMove(from, toRow, toCol) {
   return Math.abs(from.row - toRow) <= 1 && Math.abs(from.col - toCol) <= 1;
 }
 
-// Verificação de obstáculos no caminho
+
 function hasObstaclesInPath(from, toRow, toCol) {
   const rowStep = toRow > from.row ? 1 : toRow < from.row ? -1 : 0;
   const colStep = toCol > from.col ? 1 : toCol < from.col ? -1 : 0;
@@ -200,14 +200,14 @@ function hasObstaclesInPath(from, toRow, toCol) {
   return false;
 }
 
-// Verifica se pode capturar uma peça inimiga
+
 function canCaptureEnemyPiece(piece, toRow, toCol) {
   const targetPiece = board[toRow][toCol];
   return targetPiece && ((piece === piece.toLowerCase() && targetPiece === targetPiece.toUpperCase()) ||
                          (piece === piece.toUpperCase() && targetPiece === targetPiece.toLowerCase()));
 }
 
-// Mostra os movimentos possíveis
+
 function showPossibleMoves(piece, row, col) {
   removeHighlight();
   for (let r = 0; r < 8; r++) {
@@ -220,7 +220,7 @@ function showPossibleMoves(piece, row, col) {
   }
 }
 
-// Remove os destaques
+
 function removeHighlight() {
   document.querySelectorAll('.highlight, .capture-highlight').forEach(square => {
     square.classList.remove('highlight', 'capture-highlight');
@@ -232,6 +232,6 @@ function positionToString(row, col) {
   return `${letters[col]}${8 - row}`;
 }
 
-// Inicializa o tabuleiro
+
 createBoard();
 document.getElementById('turn-info').textContent = `Turno: Jogador Branco`;
