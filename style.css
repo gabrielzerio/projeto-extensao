@@ -27,17 +27,17 @@ body {
 .chess-board {
   display: grid;
   grid-template-columns: repeat(8, 60px);
-  grid-template-rows: repeat(8, 60px);
-  border: 4px solid #333;
+  grid-template-rows: repeat(8, 6 0px);
+  border: 4px solid #333; 
 }
 
 .chess-board div {
-  width: 60px;
-  height: 60px;
+width: 60px;
+height: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 24px;
+  font-size: 40px;
   cursor: pointer;
 }
 

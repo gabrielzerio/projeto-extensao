@@ -1,18 +1,41 @@
 
-const board = [
-  ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-  ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-  ['', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', ''],
-  ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-  ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+const board = Array(8).fill(null).map(() => Array(8).fill(null));
+
+
+const pieces = [
+  { type: 'rook', color: 'black', position: { row: 0, col: 0 } },
+  { type: 'knight', color: 'black', position: { row: 0, col: 1 } },
+  { type: 'bishop', color: 'black', position: { row: 0, col: 2 } },
+  { type: 'queen', color: 'black', position: { row: 0, col: 3 } },
+  { type: 'king', color: 'black', position: { row: 0, col: 4 } },
+  { type: 'bishop', color: 'black', position: { row: 0, col: 5 } },
+  { type: 'knight', color: 'black', position: { row: 0, col: 6 } },
+  { type: 'rook', color: 'black', position: { row: 0, col: 7 } },
+  ...Array(8).fill(null).map((_, i) => ({ type: 'pawn', color: 'black', position: { row: 1, col: i } })),
+  ...Array(8).fill(null).map((_, i) => ({ type: 'pawn', color: 'white', position: { row: 6, col: i } })),
+  { type: 'rook', color: 'white', position: { row: 7, col: 0 } },
+  { type: 'knight', color: 'white', position: { row: 7, col: 1 } },
+  { type: 'bishop', color: 'white', position: { row: 7, col: 2 } },
+  { type: 'queen', color: 'white', position: { row: 7, col: 3 } },
+  { type: 'king', color: 'white', position: { row: 7, col: 4 } },
+  { type: 'bishop', color: 'white', position: { row: 7, col: 5 } },
+  { type: 'knight', color: 'white', position: { row: 7, col: 6 } },
+  { type: 'rook', color: 'white', position: { row: 7, col: 7 } },
 ];
+
 
 let selectedPiece = null;
 let selectedPosition = null;
-let currentTurn = 'white'; 
+let currentTurn = 'white';
+
+
+function initializeBoard() {
+  board.forEach(row => row.fill(null)); 
+  pieces.forEach(piece => {
+    const { row, col } = piece.position;
+    board[row][col] = piece; 
+  });
+}
 
 
 function createBoard() {
@@ -27,13 +50,25 @@ function createBoard() {
       
       const piece = board[row][col];
       if (piece) {
-        square.innerHTML = piece;
+        square.textContent = pieceToSymbol(piece); 
       }
-
       square.addEventListener('click', () => handleSquareClick(row, col));
       chessBoard.appendChild(square);
     }
   }
+}
+
+
+function pieceToSymbol(piece) {
+  const symbols = {
+    rook: { white: '♖', black: '♜' },
+    knight: { white: '♘', black: '♞' },
+    bishop: { white: '♗', black: '♝' },
+    queen: { white: '♕', black: '♛' },
+    king: { white: '♔', black: '♚' },
+    pawn: { white: '♙', black: '♟' },
+  };
+  return symbols[piece.type][piece.color];
 }
 
 
@@ -45,75 +80,43 @@ function toggleTurn() {
 
 function handleSquareClick(row, col) {
   const piece = board[row][col];
-  const pieceColor = piece && piece === piece.toUpperCase() ? 'white' : 'black';
 
   if (selectedPiece) {
-    movePiece(selectedPiece, selectedPosition, row, col);
-    removeHighlight();
-  } else {
-    if (!piece || pieceColor !== currentTurn) {
-      document.getElementById('move-info').textContent = "Não é sua vez ou a célula está vazia!";
-      return;
+    if (movePiece(selectedPiece, selectedPosition, row, col)) {
+      toggleTurn();
+      selectedPiece = null;
+      selectedPosition = null;
+    } else {
+      document.getElementById('move-info').textContent = 'Movimento inválido. Tente novamente.';
+      selectedPiece = null;
+      selectedPosition = null;
     }
+  } else if (piece && piece.color === currentTurn) {
     selectedPiece = piece;
     selectedPosition = { row, col };
-    document.getElementById('move-info').textContent = `Peça selecionada: ${piece} em ${positionToString(row, col)}`;
+    document.getElementById('move-info').textContent = `Peça selecionada: ${pieceToSymbol(piece)} em ${positionToString(row, col)}`;
     showPossibleMoves(piece, row, col);
   }
 }
 
+
 function movePiece(piece, from, toRow, toCol) {
-  const valid = isValidMove(piece, from, toRow, toCol);
-  
-  if (valid) {
-    
-    board[from.row][from.col] = '';
-    board[toRow][toCol] = piece;
+  if (isValidMove(piece, from, toRow, toCol)) {
+    const target = board[toRow][toCol];
+    if (target) {
+      pieces.splice(pieces.indexOf(target), 1); 
+    }
 
-    
-    selectedPiece = null;
-    selectedPosition = null;
-    
-    
-    createBoard();
+    board[from.row][from.col] = null; 
+    board[toRow][toCol] = piece; 
+    piece.position = { row: toRow, col: toCol }; 
 
-    
-    currentTurn = currentTurn === 'white' ? 'black' : 'white';
-    document.getElementById('turn-info').textContent = `Turno: ${currentTurn === 'white' ? 'Jogador Branco' : 'Jogador Preto'}`;
-    
-    
+    createBoard(); 
     document.getElementById('move-info').textContent = `Peça movida para ${positionToString(toRow, toCol)}`;
-  } else {
-    
-    document.getElementById('move-info').textContent = 'Movimento inválido. Tente novamente.';
-    selectedPiece = null;
-    selectedPosition = null;
-    removeHighlight();  
+    return true;
   }
+  return false;
 }
-
-
-
-function isValidMove(piece, from, toRow, toCol) {
-  const targetPiece = board[toRow][toCol];
-  
-  
-  if (targetPiece && ((piece === piece.toUpperCase() && targetPiece === targetPiece.toUpperCase()) || 
-                      (piece === piece.toLowerCase() && targetPiece === targetPiece.toLowerCase()))) {
-    return false;
-  }
-
-  switch (piece.toLowerCase()) {
-    case 'p': return isValidPawnMove(piece, from, toRow, toCol);
-    case 'r': return isValidRookMove(from, toRow, toCol);
-    case 'n': return isValidKnightMove(from, toRow, toCol);
-    case 'b': return isValidBishopMove(from, toRow, toCol);
-    case 'q': return isValidQueenMove(from, toRow, toCol);
-    case 'k': return isValidKingMove(from, toRow, toCol);
-    default: return false;
-  }
-}
-
 
 
 function showPossibleMoves(piece, row, col) {
@@ -129,109 +132,122 @@ function showPossibleMoves(piece, row, col) {
 }
 
 
-function removeHighlight() {
-  const highlightedSquares = document.querySelectorAll('.highlight, .capture-highlight');
-  highlightedSquares.forEach(square => {
-    square.classList.remove('highlight', 'capture-highlight');
-  });
-}
-
-
-function canCaptureEnemyPiece(piece, toRow, toCol) {
+function isValidMove(piece, from, toRow, toCol) {
   const targetPiece = board[toRow][toCol];
-  return targetPiece && targetPiece !== '' && ((piece === piece.toLowerCase() && targetPiece === targetPiece.toUpperCase()) ||
-          (piece === piece.toUpperCase() && targetPiece === targetPiece.toLowerCase()));
-}
+  if (targetPiece && targetPiece.color === piece.color) return false;
 
-
-function positionToString(row, col) {
-  const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-  return `${letters[col]}${8 - row}`;
+  switch (piece.type) {
+    case 'pawn':
+      return isValidPawnMove(piece, from, toRow, toCol);
+    case 'rook':
+      return isValidRookMove(from, toRow, toCol);
+    case 'knight':
+      return isValidKnightMove(from, toRow, toCol);
+    case 'bishop':
+      return isValidBishopMove(from, toRow, toCol);
+    case 'queen':
+      return isValidQueenMove(from, toRow, toCol);
+    case 'king':
+      return isValidKingMove(from, toRow, toCol);
+    default:
+      return false;
+  }
 }
 
 
 function isValidPawnMove(piece, from, toRow, toCol) {
-  const direction = piece === 'P' ? -1 : 1;
-  const startRow = piece === 'P' ? 6 : 1;
-
-  if (from.col === toCol && board[toRow][toCol] === '') {
-    return (toRow === from.row + direction) || (from.row === startRow && toRow === from.row + 2 * direction);
+  const direction = piece.color === 'white' ? -1 : 1; 
+  const startRow = piece.color === 'white' ? 6 : 1;
+  
+  
+  if (from.col === toCol && board[toRow][toCol] === null) {
+    
+    if (toRow === from.row + direction) return true;
+    
+    if (from.row === startRow && toRow === from.row + 2 * direction) return true;
   }
 
+  
   if (Math.abs(from.col - toCol) === 1 && toRow === from.row + direction) {
-    return canCaptureEnemyPiece(piece, toRow, toCol);
+    if (board[toRow][toCol] && board[toRow][toCol].color !== piece.color) {
+      return true; 
+    }
   }
-  return false;
+
+  return false; 
 }
+
 
 function isValidRookMove(from, toRow, toCol) {
-  return (from.row === toRow || from.col === toCol) && !hasObstaclesInPath(from, toRow, toCol);
-}
-
-function isValidKnightMove(from, toRow, toCol) {
   const rowDiff = Math.abs(from.row - toRow);
   const colDiff = Math.abs(from.col - toCol);
-  return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+  if (rowDiff === 0 || colDiff === 0) {
+    return !isPathBlocked(from, toRow, toCol); 
+  }
+  return false; 
 }
 
+
 function isValidBishopMove(from, toRow, toCol) {
-  return Math.abs(from.row - toRow) === Math.abs(from.col - toCol) && !hasObstaclesInPath(from, toRow, toCol);
+  const rowDiff = Math.abs(from.row - toRow);
+  const colDiff = Math.abs(from.col - toCol);
+  if (rowDiff === colDiff) {
+    return !isPathBlocked(from, toRow, toCol); 
+  }
+  return false; 
 }
+
 
 function isValidQueenMove(from, toRow, toCol) {
   return isValidRookMove(from, toRow, toCol) || isValidBishopMove(from, toRow, toCol);
 }
 
+
 function isValidKingMove(from, toRow, toCol) {
-  return Math.abs(from.row - toRow) <= 1 && Math.abs(from.col - toCol) <= 1;
+  const rowDiff = Math.abs(from.row - toRow);
+  const colDiff = Math.abs(from.col - toCol);
+  return (rowDiff <= 1 && colDiff <= 1); 
 }
 
 
-function hasObstaclesInPath(from, toRow, toCol) {
-  const rowStep = toRow > from.row ? 1 : toRow < from.row ? -1 : 0;
-  const colStep = toCol > from.col ? 1 : toCol < from.col ? -1 : 0;
+function isPathBlocked(from, toRow, toCol) {
+  const rowStep = Math.sign(toRow - from.row);
+  const colStep = Math.sign(toCol - from.col);
+
   let row = from.row + rowStep;
   let col = from.col + colStep;
+
   while (row !== toRow || col !== toCol) {
-    if (board[row][col] !== '') return true;
+    if (board[row][col] !== null) {
+      return true; 
+    }
     row += rowStep;
     col += colStep;
   }
-  return false;
+  return false; 
 }
 
 
 function canCaptureEnemyPiece(piece, toRow, toCol) {
   const targetPiece = board[toRow][toCol];
-  return targetPiece && ((piece === piece.toLowerCase() && targetPiece === targetPiece.toUpperCase()) ||
-                         (piece === piece.toUpperCase() && targetPiece === targetPiece.toLowerCase()));
+  return targetPiece && targetPiece.color !== piece.color;
 }
 
 
-function showPossibleMoves(piece, row, col) {
-  removeHighlight();
-  for (let r = 0; r < 8; r++) {
-    for (let c = 0; c < 8; c++) {
-      if (isValidMove(piece, { row, col }, r, c)) {
-        const square = document.getElementById(`${r}-${c}`);
-        square.classList.add(canCaptureEnemyPiece(piece, r, c) ? 'capture-highlight' : 'highlight');
-      }
-    }
-  }
+function positionToString(row, col) {
+  const letters = 'abcdefgh';
+  return `${letters[col]}${8 - row}`; 
 }
 
 
 function removeHighlight() {
-  document.querySelectorAll('.highlight, .capture-highlight').forEach(square => {
+  const squares = document.querySelectorAll('#board div');
+  squares.forEach(square => {
     square.classList.remove('highlight', 'capture-highlight');
   });
 }
 
-function positionToString(row, col) {
-  const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-  return `${letters[col]}${8 - row}`;
-}
 
-
+initializeBoard();
 createBoard();
-document.getElementById('turn-info').textContent = `Turno: Jogador Branco`;
+toggleTurn();
