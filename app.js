@@ -202,6 +202,14 @@ function isValidQueenMove(from, toRow, toCol) {
   return isValidRookMove(from, toRow, toCol) || isValidBishopMove(from, toRow, toCol);
 }
 
+function isValidKnightMove(from, toRow, toCol) {
+  const rowDiff = Math.abs(from.row - toRow);
+  const colDiff = Math.abs(from.col - toCol);
+
+  // O cavalo se move em "L": 2 casas em uma direção e 1 na outra
+  return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+}
+
 
 function isValidKingMove(from, toRow, toCol) {
   const rowDiff = Math.abs(from.row - toRow);
