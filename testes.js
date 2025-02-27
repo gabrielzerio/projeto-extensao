@@ -3,21 +3,21 @@ const board = Array(8).fill(null).map(() => Array(8).fill(null));
 
 
 const pieces = [
-  { type: 'rook', color: 'black', position: { row: 0, col: 0 } },
+  { type: 'rook', color: 'black', position: { row: 4, col: 0 } },
   { type: 'knight', color: 'black', position: { row: 0, col: 1 } },
   { type: 'bishop', color: 'black', position: { row: 0, col: 2 } },
-  { type: 'queen', color: 'black', position: { row: 0, col: 3 } },
+  { type: 'queen', color: 'black', position: { row: 5, col: 1 } },
   { type: 'king', color: 'black', position: { row: 0, col: 4 } },
   { type: 'bishop', color: 'black', position: { row: 0, col: 5 } },
   { type: 'knight', color: 'black', position: { row: 0, col: 6 } },
-  { type: 'rook', color: 'black', position: { row: 0, col: 7 } },
+  { type: 'rook', color: 'black', position: { row: 2, col: 0 } },
   ...Array(8).fill(null).map((_, i) => ({ type: 'pawn', color: 'black', position: { row: 1, col: i } })),
   ...Array(8).fill(null).map((_, i) => ({ type: 'pawn', color: 'white', position: { row: 6, col: i } })),
   { type: 'rook', color: 'white', position: { row: 7, col: 0 } },
   { type: 'knight', color: 'white', position: { row: 7, col: 1 } },
   { type: 'bishop', color: 'white', position: { row: 7, col: 2 } },
-  { type: 'queen', color: 'white', position: { row: 7, col: 3 } },
-  { type: 'king', color: 'white', position: { row: 7, col: 4 } },
+  { type: 'queen', color: 'white', position: { row: 5, col: 3 } },
+  { type: 'king', color: 'white', position: { row: 3, col: 7 } },
   { type: 'bishop', color: 'white', position: { row: 7, col: 5 } },
   { type: 'knight', color: 'white', position: { row: 7, col: 6 } },
   { type: 'rook', color: 'white', position: { row: 7, col: 7 } },
@@ -285,7 +285,7 @@ function isCheckmate(color) {
           if (isValidMove(piece, { row, col }, r, c)) {
             const originalPiece = board[r][c]; 
             const originalPosition = { ...piece.position }; 
-              console.log('xaque-maeqwe')
+
             // Simula o movimento
             board[row][col] = null;
             board[r][c] = piece;
@@ -308,6 +308,37 @@ function isCheckmate(color) {
   }
 
   return true; // Nenhuma peça pode sair do xeque -> xeque-mate
+}
+
+
+function hasValidMoves(color) {
+  // Encontra todas as peças do jogador
+  const playerPieces = pieces.filter(p => p.color === color);
+
+  // Para cada peça do jogador, verifica se há um movimento que remova o xeque
+  for (const piece of playerPieces) {
+    const originalPos = { ...piece.position };
+
+    // Simula todas as jogadas possíveis
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        if (isValidMove(piece, originalPos, row, col)) {
+          // Move temporariamente a peça
+          piece.position = { row, col };
+          console.log('a');
+          // Verifica se o rei ainda está em xeque
+          if (!isKingInCheck(color)) {
+            piece.position = originalPos; // Restaura a posição original
+            return true; // O jogador ainda tem uma jogada válida
+          }
+
+          piece.position = originalPos; // Restaura a posição original
+        }
+      }
+    }
+  }
+
+  return false; // Nenhuma jogada possível, é xeque-mate
 }
 
 
