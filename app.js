@@ -26,7 +26,7 @@ const pieces = [
 
 let selectedPiece = null;
 let selectedPosition = null;
-let currentTurn = 'white';
+let currentTurn = 'black';
 
 
 function initializeBoard() {
@@ -75,6 +75,7 @@ function pieceToSymbol(piece) {
 function toggleTurn() {
   currentTurn = currentTurn === 'white' ? 'black' : 'white';
   document.getElementById('turn-info').textContent = `Turno: ${currentTurn === 'white' ? 'Jogador Branco' : 'Jogador Preto'}`;
+
 }
 
 
@@ -86,6 +87,9 @@ function handleSquareClick(row, col) {
       toggleTurn();
       selectedPiece = null;
       selectedPosition = null;
+      if (isKingInCheck(currentTurn)) {
+        alert(`O rei ${currentTurn === 'white' ? 'branco' : 'preto'} está em xeque!`);
+      }
     } else {
       document.getElementById('move-info').textContent = 'Movimento inválido. Tente novamente.';
       selectedPiece = null;
@@ -254,6 +258,15 @@ function removeHighlight() {
     square.classList.remove('highlight', 'capture-highlight');
   });
 }
+
+function isKingInCheck(color) {
+  const king = pieces.find(p => p.type === 'king' && p.color === color);
+  if (!king) return false;
+
+  return pieces.some(p => p.color !== color && isValidMove(p, p.position, king.position.row, king.position.col));
+}
+
+
 
 
 initializeBoard();
