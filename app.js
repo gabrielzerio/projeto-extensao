@@ -88,7 +88,7 @@ function handleSquareClick(row, col) {
       selectedPiece = null;
       selectedPosition = null;
 
-      // Verifica ambos os reis após o movimento
+      // Verifica o status de ambos os reis
       ['white', 'black'].forEach(color => {
         if (isKingInCheck(color)) {
           if (isCheckmate(color)) {
@@ -111,6 +111,7 @@ function handleSquareClick(row, col) {
     showPossibleMoves(piece, row, col);
   }
 }
+
 
 
 
@@ -283,30 +284,29 @@ function isCheckmate(color) {
   }
 
   // Para cada peça do jogador em xeque, verifica se há algum movimento válido
-  for (const piece of pieces) {
-    if (piece.color === color) {
-      const { row, col } = piece.position;
-      for (let r = 0; r < 8; r++) {
-        for (let c = 0; c < 8; c++) {
-          if (isValidMove(piece, { row, col }, r, c)) {
-            const originalPiece = board[r][c]; 
-            const originalPosition = { ...piece.position }; 
-              console.log('xaque-maeqwe')
-            // Simula o movimento
-            board[row][col] = null;
-            board[r][c] = piece;
-            piece.position = { row: r, col: c };
+  for (const piece of pieces.filter(p => p.color === color)) {
+    const { row, col } = piece.position;
 
-            const stillInCheck = isKingInCheck(color);
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        if (isValidMove(piece, { row, col }, r, c)) {
+          const originalPiece = board[r][c]; 
+          const originalPosition = { ...piece.position };
 
-            // Reverte a jogada simulada
-            board[row][col] = piece;
-            board[r][c] = originalPiece;
-            piece.position = originalPosition;
+          // Simula o movimento
+          board[row][col] = null;
+          board[r][c] = piece;
+          piece.position = { row: r, col: c };
 
-            if (!stillInCheck) {
-              return false; // Existe pelo menos um movimento que tira o rei do xeque
-            }
+          const stillInCheck = isKingInCheck(color);
+
+          // Reverte a jogada simulada
+          board[row][col] = piece;
+          board[r][c] = originalPiece;
+          piece.position = originalPosition;
+
+          if (!stillInCheck) {
+            return false; // Existe pelo menos um movimento que tira o rei do xeque
           }
         }
       }
@@ -315,6 +315,7 @@ function isCheckmate(color) {
 
   return true; // Nenhuma peça pode sair do xeque -> xeque-mate
 }
+
 
 
 
