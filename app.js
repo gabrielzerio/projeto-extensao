@@ -87,14 +87,18 @@ function handleSquareClick(row, col) {
       toggleTurn();
       selectedPiece = null;
       selectedPosition = null;
-      if (isKingInCheck(currentTurn)) {
-        if (isCheckmate(currentTurn)) {
-          alert(`Xeque-mate! O jogador ${currentTurn === 'white' ? 'preto' : 'branco'} venceu!`);
-        } else {
-          alert(`O rei ${currentTurn === 'white' ? 'branco' : 'preto'} está em xeque!`);
+
+      // Verifica ambos os reis após o movimento
+      ['white', 'black'].forEach(color => {
+        if (isKingInCheck(color)) {
+          if (isCheckmate(color)) {
+            alert(`Xeque-mate! O jogador ${color === 'white' ? 'preto' : 'branco'} venceu!`);
+          } else {
+            alert(`O rei ${color === 'white' ? 'branco' : 'preto'} está em xeque!`);
+          }
         }
-      }
-      
+      });
+
     } else {
       document.getElementById('move-info').textContent = 'Movimento inválido. Tente novamente.';
       selectedPiece = null;
@@ -107,6 +111,8 @@ function handleSquareClick(row, col) {
     showPossibleMoves(piece, row, col);
   }
 }
+
+
 
 
 function movePiece(piece, from, toRow, toCol) {
