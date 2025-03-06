@@ -81,13 +81,13 @@ function toggleTurn() {
 
 function handleSquareClick(row, col) {
   const piece = board[row][col];
-
   if (selectedPiece) {
+    
     if (movePiece(selectedPiece, selectedPosition, row, col)) {
       toggleTurn();
       selectedPiece = null;
       selectedPosition = null;
-
+      
       // Verifica o status de ambos os reis
       ['white', 'black'].forEach(color => {
         if (isKingInCheck(color)) {
@@ -98,23 +98,38 @@ function handleSquareClick(row, col) {
           }
         }
       });
-
+      
     } else {
       document.getElementById('move-info').textContent = 'Movimento inválido. Tente novamente.';
+      bgPieceColoring(false)
       selectedPiece = null;
       selectedPosition = null;
+      removeHighlight();
+      
     }
   } else if (piece && piece.color === currentTurn) {
+    
     selectedPiece = piece;
     selectedPosition = { row, col };
     document.getElementById('move-info').textContent = `Peça selecionada: ${pieceToSymbol(piece)} em ${positionToString(row, col)}`;
     showPossibleMoves(piece, row, col);
+    bgPieceColoring(true)
   }
 }
 
-
-
-
+function bgPieceColoring(mov) {
+  const pecaSelecionada = document.getElementById(`${selectedPiece.position.row}-${selectedPiece.position.col}`);
+  if (selectedPiece && mov) {
+    pecaSelecionada.style.backgroundColor = "lightyellow";
+    return;
+  }
+    if(pecaSelecionada.className == 'white-square'){
+      pecaSelecionada.style.backgroundColor = "#f0d9b5";
+    }
+    else{
+      pecaSelecionada.style.backgroundColor = "#b58863";
+    } 
+}
 
 function movePiece(piece, from, toRow, toCol) {
   if (isValidMove(piece, from, toRow, toCol)) {
