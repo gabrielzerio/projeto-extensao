@@ -1,4 +1,3 @@
-
 const board = Array(8).fill(null).map(() => Array(8).fill(null));
 
 
@@ -88,7 +87,7 @@ function handleSquareClick(row, col) {
       selectedPiece = null;
       selectedPosition = null;
       
-      // auauerifica o status de ambos os reis
+      // Verifica o status de ambos os reis
       ['white', 'black'].forEach(color => {
         if (isKingInCheck(color)) {
           if (isCheckmate(color)) {
@@ -195,7 +194,22 @@ function isValidPawnMove(piece, from, toRow, toCol) {
     
     if (toRow === from.row + direction) return true;
     
-    if (from.row === startRow && toRow === from.row + 2 * direction) return true;
+    if (
+      from.row === startRow &&
+      toRow === from.row + 2 * direction &&
+      board[from.row + direction][toCol] === null && // Verifica se a casa à frente está vazia
+      board[toRow][toCol] === null // Verifica se a casa duas à frente também está vazia
+    ) {
+      return true;
+    }
+
+    if (Math.abs(from.col - toCol) === 1 && toRow === from.row + direction) {
+      if (board[toRow][toCol] && board[toRow][toCol].color !== piece.color) {
+        return true; 
+      }
+    }
+  
+    return false; 
   }
 
   
