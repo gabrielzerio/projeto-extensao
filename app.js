@@ -88,7 +88,7 @@ function handleSquareClick(row, col) {
       selectedPiece = null;
       selectedPosition = null;
       
-      // Verifica o status de ambos os reis
+      // auauerifica o status de ambos os reis
       ['white', 'black'].forEach(color => {
         if (isKingInCheck(color)) {
           if (isCheckmate(color)) {
