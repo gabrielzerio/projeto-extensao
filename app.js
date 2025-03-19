@@ -1,4 +1,3 @@
-
 const board = Array(8).fill(null).map(() => Array(8).fill(null));
 
 
@@ -111,7 +110,7 @@ function handleSquareClick(row, col) {
     
     selectedPiece = piece;
     selectedPosition = { row, col };
-    document.getElementById('move-info').textContent = `Peça selecionada: ${pieceToSymbol(piece)} em ${positionToString(row, col)}`;
+    document.getElementById('move-info').textContent = `Peça selecionada: ${pieceToSymbol(piece)} em ${positionToString(row, col).toUpperCase()}`;
     showPossibleMoves(piece, row, col);
     bgPieceColoring(true)
   }
@@ -131,19 +130,39 @@ function bgPieceColoring(mov) {
     } 
 }
 
+// {
+//   "type": "pawn",
+//   "color": "black",
+//   "position": {
+//       "row": 3,
+//       "col": 2
+//   }
+// }
+
+function removePiece(target) {
+  const colorDiv = target.color === 'black' ? 'black' : 'white'
+  const div = document.getElementById(`${colorDiv}-pieces`);
+  const span = document.createElement('span');
+  span.innerHTML = pieceToSymbol(target); 
+  div.appendChild(span);
+}
+
 function movePiece(piece, from, toRow, toCol) {
   if (isValidMove(piece, from, toRow, toCol)) {
     const target = board[toRow][toCol];
+    console.log(target)
     if (target) {
+      removePiece(target)
       pieces.splice(pieces.indexOf(target), 1); 
     }
+
 
     board[from.row][from.col] = null; 
     board[toRow][toCol] = piece; 
     piece.position = { row: toRow, col: toCol }; 
 
     createBoard(); 
-    document.getElementById('move-info').textContent = `Peça movida para ${positionToString(toRow, toCol)}`;
+    document.getElementById('move-info').textContent = `Peça movida para ${positionToString(toRow, toCol).toUpperCase()}`;
     return true;
   }
   return false;
@@ -195,7 +214,22 @@ function isValidPawnMove(piece, from, toRow, toCol) {
     
     if (toRow === from.row + direction) return true;
     
-    if (from.row === startRow && toRow === from.row + 2 * direction) return true;
+    if (
+      from.row === startRow &&
+      toRow === from.row + 2 * direction &&
+      board[from.row + direction][toCol] === null && // Verifica se a casa à frente está vazia
+      board[toRow][toCol] === null // Verifica se a casa duas à frente também está vazia
+    ) {
+      return true;
+    }
+
+    if (Math.abs(from.col - toCol) === 1 && toRow === from.row + direction) {
+      if (board[toRow][toCol] && board[toRow][toCol].color !== piece.color) {
+        return true; 
+      }
+    }
+  
+    return false; 
   }
 
   

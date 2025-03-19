@@ -1,48 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jogo de Xadrez</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jogo de Xadrez</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <div id="turn-info"></div>
-  <div class="chess-container">
-    <div id="board-wrapper" class="board-wrapper">
-      
-     
-      <div id="board" class="chess-board">
-        
+    <div class="dead-pieces"><div id="black-pieces"></div> <div id="white-pieces"></div></div>
+    <div class="chess-container">
+      <div>
+        <div id="board-wrapper" class="board-wrapper">
+          <div id="board" class="chess-board"></div>
+
+          <div class="y-coordinates">
+            <div>8</div>
+            <div>7</div>
+            <div>6</div>
+            <div>5</div>
+            <div>4</div>
+            <div>3</div>
+            <div>2</div>
+            <div>1</div>
+          </div>
+        </div>
+
+        <div class="x-coordinates">
+          <div>A</div>
+          <div>B</div>
+          <div>C</div>
+          <div>D</div>
+          <div>E</div>
+          <div>F</div>
+          <div>G</div>
+          <div>H</div>
+        </div>
+        <div class="info-panel">
+          <p id="move-info">Clique em uma peça para mover</p>
+          <p id="hint"></p>
+        </div>
       </div>
-      
-      <div class="y-coordinates">
-        <div>8</div>
-        <div>7</div>
-        <div>6</div>
-        <div>5</div>
-        <div>4</div>
-        <div>3</div>
-        <div>2</div>
-        <div>1</div>
-      </div>
     </div>
-    
-    <div class="x-coordinates">
-      <div>A</div>
-      <div>B</div>
-      <div>C</div>
-      <div>D</div>
-      <div>E</div>
-      <div>F</div>
-      <div>G</div>
-      <div>H</div>
-    </div>
-    <div class="info-panel">
-      <p id="move-info">Clique em uma peça para mover</p>
-      <p id="hint"></p>
-    </div>
-  </div>
-  <script src="app.js"></script>
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>
