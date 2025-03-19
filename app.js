@@ -110,7 +110,7 @@ function handleSquareClick(row, col) {
     
     selectedPiece = piece;
     selectedPosition = { row, col };
-    document.getElementById('move-info').textContent = `Peça selecionada: ${pieceToSymbol(piece)} em ${positionToString(row, col)}`;
+    document.getElementById('move-info').textContent = `Peça selecionada: ${pieceToSymbol(piece)} em ${positionToString(row, col).toUpperCase()}`;
     showPossibleMoves(piece, row, col);
     bgPieceColoring(true)
   }
@@ -130,19 +130,39 @@ function bgPieceColoring(mov) {
     } 
 }
 
+// {
+//   "type": "pawn",
+//   "color": "black",
+//   "position": {
+//       "row": 3,
+//       "col": 2
+//   }
+// }
+
+function removePiece(target) {
+  const colorDiv = target.color === 'black' ? 'black' : 'white'
+  const div = document.getElementById(`${colorDiv}-pieces`);
+  const span = document.createElement('span');
+  span.innerHTML = pieceToSymbol(target); 
+  div.appendChild(span);
+}
+
 function movePiece(piece, from, toRow, toCol) {
   if (isValidMove(piece, from, toRow, toCol)) {
     const target = board[toRow][toCol];
+    console.log(target)
     if (target) {
+      removePiece(target)
       pieces.splice(pieces.indexOf(target), 1); 
     }
+
 
     board[from.row][from.col] = null; 
     board[toRow][toCol] = piece; 
     piece.position = { row: toRow, col: toCol }; 
 
     createBoard(); 
-    document.getElementById('move-info').textContent = `Peça movida para ${positionToString(toRow, toCol)}`;
+    document.getElementById('move-info').textContent = `Peça movida para ${positionToString(toRow, toCol).toUpperCase()}`;
     return true;
   }
   return false;
