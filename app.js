@@ -108,6 +108,7 @@ function handleSquareClick(row, col) {
               `Xeque-mate! O jogador ${color === "white" ? "preto" : "branco"
               } venceu!`
             );
+            showEndGame();
           } else {
             alert(
               `O rei ${color === "white" ? "branco" : "preto"} está em xeque!`
@@ -410,6 +411,15 @@ function playersName() {
     player2Name = document.getElementById("player2").value;
     modal.close();
   });
+}
+
+function showEndGame(){
+  const modal = document.getElementById('modal2');
+  modal.showModal();
+  const btn = document.getElementById('restartGame');
+  btn.addEventListener('click', () => {
+    location.reload();
+  })
 }
 
 initializeBoard();
