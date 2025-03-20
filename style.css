@@ -65,20 +65,23 @@ body {
 }
 
 .chess-board div {
-width: 60px;
-height: 60px;
+  width: 60px;
+  height: 60px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  font-size: 40px;
-  cursor: pointer;
+  justify-content: center;
+  position: relative; /* Mantém as peças alinhadas corretamente */
 }
 
-.chess-piece {
-  position: absolute;
-  transition: transform 0.3s ease-in-out;
-  font-size: 2rem;
-  cursor: grab;
+.piece {
+  transition: transform 0.3s ease-in-out; /* Apenas a peça se move */
+  position: absolute; /* Permite mover sem afetar a célula */
+  font-size: 40px; /* Ajuste o tamanho da peça */
+}
+
+.chess-board div {
+  position: relative; /* Permite animação de deslocamento */
+  transition: transform 0.3s ease-in-out; /* Animação suave */
 }
 
 

@@ -56,6 +56,8 @@ function createBoard() {
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
       const square = document.createElement("div");
+      const spanElement = document.createElement('span');
+      spanElement.classList.add('piece')
       square.id = `${row}-${col}`;
       square.classList.add(
         (row + col) % 2 === 0 ? "white-square" : "black-square"
@@ -63,9 +65,10 @@ function createBoard() {
 
       const piece = board[row][col];
       if (piece) {
-        square.textContent = pieceToSymbol(piece);
+        spanElement.textContent = pieceToSymbol(piece);
       }
       square.addEventListener("click", () => handleSquareClick(row, col));
+      square.appendChild(spanElement)
       chessBoard.appendChild(square);
     }
   }
@@ -170,30 +173,35 @@ function removePiece(target) {
 function movePiece(piece, from, toRow, toCol) {
   if (isValidMove(piece, from, toRow, toCol)) {
     const target = board[toRow][toCol];
+    const pieceElement = document.getElementById(`${from.row}-${from.col}`).querySelector(".piece");
 
     if (target) {
-      if (target.type === "king") {
-        endGame();
-      }
       removePiece(target);
       pieces.splice(pieces.indexOf(target), 1);
     }
 
     board[from.row][from.col] = null;
     board[toRow][toCol] = piece;
-    piece.position = { row: toRow, col: toCol };
 
-    createBoard();
-    document.getElementById(
-      "move-info"
-    ).textContent = `Peça movida para ${positionToString(
-      toRow,
-      toCol
-    ).toUpperCase()}`;
-    return true;
+    // Calculando deslocamento baseado no tamanho do quadrado
+    const squareSize = 60; // Ajuste conforme necessário
+    const deltaX = (toCol - from.col) * squareSize;
+    const deltaY = (toRow - from.row) * squareSize;
+
+    // Movendo a peça suavemente
+    pieceElement.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+    setTimeout(() => {
+      // Atualiza a posição no tabuleiro após a animação
+      pieceElement.style.transform = "";
+      pieceElement.parentElement.id = `${toRow}-${toCol}`;
+      createBoard();
+    }, 300);
   }
-  return false;
 }
+
+
+
 
 function showPossibleMoves(piece, row, col) {
   removeHighlight();
