@@ -56,6 +56,8 @@ function createBoard() {
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
       const square = document.createElement("div");
+      const spanElement = document.createElement('span');
+      spanElement.classList.add('piece')
       square.id = `${row}-${col}`;
       square.classList.add(
         (row + col) % 2 === 0 ? "white-square" : "black-square"
@@ -63,9 +65,10 @@ function createBoard() {
 
       const piece = board[row][col];
       if (piece) {
-        square.textContent = pieceToSymbol(piece);
+        spanElement.textContent = pieceToSymbol(piece);
       }
       square.addEventListener("click", () => handleSquareClick(row, col));
+      square.appendChild(spanElement)
       chessBoard.appendChild(square);
     }
   }
@@ -85,9 +88,8 @@ function pieceToSymbol(piece) {
 
 function toggleTurn() {
   currentTurn = currentTurn === "white" ? "black" : "white";
-  document.getElementById("turn-info").textContent = `Turno: ${
-    currentTurn === "white" ? "Jogador Branco" : "Jogador Preto"
-  }`;
+  document.getElementById("turn-info").textContent = `Turno: ${currentTurn === "white" ? "Jogador Branco" : "Jogador Preto"
+    }`;
 }
 
 function handleSquareClick(row, col) {
@@ -103,8 +105,7 @@ function handleSquareClick(row, col) {
         if (isKingInCheck(color)) {
           if (isCheckmate(color)) {
             alert(
-              `Xeque-mate! O jogador ${
-                color === "white" ? "preto" : "branco"
+              `Xeque-mate! O jogador ${color === "white" ? "preto" : "branco"
               } venceu!`
             );
           } else {
@@ -170,11 +171,9 @@ function removePiece(target) {
 function movePiece(piece, from, toRow, toCol) {
   if (isValidMove(piece, from, toRow, toCol)) {
     const target = board[toRow][toCol];
-
+    const pieceElement = document.getElementById(`${from.row}-${from.col}`).querySelector(".piece");
+    console.log(pieceElement)
     if (target) {
-      if (target.type === "king") {
-        endGame();
-      }
       removePiece(target);
       pieces.splice(pieces.indexOf(target), 1);
     }
@@ -182,18 +181,28 @@ function movePiece(piece, from, toRow, toCol) {
     board[from.row][from.col] = null;
     board[toRow][toCol] = piece;
     piece.position = { row: toRow, col: toCol };
+    // Calculando deslocamento baseado no tamanho do quadrado
+    const squareSize = 60; // Ajuste conforme necessário
+    const deltaX = (toCol - from.col) * squareSize;
+    const deltaY = (toRow - from.row) * squareSize;
 
-    createBoard();
-    document.getElementById(
-      "move-info"
-    ).textContent = `Peça movida para ${positionToString(
-      toRow,
-      toCol
-    ).toUpperCase()}`;
+    // Movendo a peça suavemente
+    pieceElement.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+    setTimeout(() => {
+      // Atualiza a posição no tabuleiro após a animação
+      pieceElement.style.transform = "";
+      pieceElement.parentElement.id = `${toRow}-${toCol}`;
+      createBoard();
+    }, 300);
+    document.getElementById('move-info').textContent = `Peça movida para ${positionToString(toRow, toCol).toUpperCase()}`;
     return true;
   }
   return false;
 }
+
+
+
 
 function showPossibleMoves(piece, row, col) {
   removeHighlight();
@@ -353,7 +362,6 @@ function isCheckmate(color) {
     return false; // O rei não está em xeque, então não pode ser xeque-mate
   }
 
-  // Para cada peça do jogador em xeque, verifica se há algum movimento válido
   for (const piece of pieces.filter((p) => p.color === color)) {
     const { row, col } = piece.position;
 
@@ -405,8 +413,8 @@ function playersName() {
 }
 
 initializeBoard();
-    createBoard();
-    toggleTurn();
+createBoard();
+toggleTurn();
 
 window.onload = () => {
   playersName();
