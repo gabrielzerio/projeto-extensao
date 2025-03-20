@@ -88,9 +88,8 @@ function pieceToSymbol(piece) {
 
 function toggleTurn() {
   currentTurn = currentTurn === "white" ? "black" : "white";
-  document.getElementById("turn-info").textContent = `Turno: ${
-    currentTurn === "white" ? "Jogador Branco" : "Jogador Preto"
-  }`;
+  document.getElementById("turn-info").textContent = `Turno: ${currentTurn === "white" ? "Jogador Branco" : "Jogador Preto"
+    }`;
 }
 
 function handleSquareClick(row, col) {
@@ -106,8 +105,7 @@ function handleSquareClick(row, col) {
         if (isKingInCheck(color)) {
           if (isCheckmate(color)) {
             alert(
-              `Xeque-mate! O jogador ${
-                color === "white" ? "preto" : "branco"
+              `Xeque-mate! O jogador ${color === "white" ? "preto" : "branco"
               } venceu!`
             );
           } else {
@@ -174,7 +172,7 @@ function movePiece(piece, from, toRow, toCol) {
   if (isValidMove(piece, from, toRow, toCol)) {
     const target = board[toRow][toCol];
     const pieceElement = document.getElementById(`${from.row}-${from.col}`).querySelector(".piece");
-
+    console.log(pieceElement)
     if (target) {
       removePiece(target);
       pieces.splice(pieces.indexOf(target), 1);
@@ -182,7 +180,7 @@ function movePiece(piece, from, toRow, toCol) {
 
     board[from.row][from.col] = null;
     board[toRow][toCol] = piece;
-
+    piece.position = { row: toRow, col: toCol };
     // Calculando deslocamento baseado no tamanho do quadrado
     const squareSize = 60; // Ajuste conforme necessário
     const deltaX = (toCol - from.col) * squareSize;
@@ -197,7 +195,10 @@ function movePiece(piece, from, toRow, toCol) {
       pieceElement.parentElement.id = `${toRow}-${toCol}`;
       createBoard();
     }, 300);
+    document.getElementById('move-info').textContent = `Peça movida para ${positionToString(toRow, toCol).toUpperCase()}`;
+    return true;
   }
+  return false;
 }
 
 
@@ -361,7 +362,6 @@ function isCheckmate(color) {
     return false; // O rei não está em xeque, então não pode ser xeque-mate
   }
 
-  // Para cada peça do jogador em xeque, verifica se há algum movimento válido
   for (const piece of pieces.filter((p) => p.color === color)) {
     const { row, col } = piece.position;
 
@@ -413,8 +413,8 @@ function playersName() {
 }
 
 initializeBoard();
-    createBoard();
-    toggleTurn();
+createBoard();
+toggleTurn();
 
 window.onload = () => {
   playersName();
