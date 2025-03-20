@@ -6,7 +6,6 @@
 
 body {
   height: 100vh;
-  width: 100vw;
   background-color: #f0f0f0;
   font-family: Arial, sans-serif;
 }
@@ -75,6 +74,14 @@ height: 60px;
   cursor: pointer;
 }
 
+.chess-piece {
+  position: absolute;
+  transition: transform 0.3s ease-in-out;
+  font-size: 2rem;
+  cursor: grab;
+}
+
+
 .white-square {
   background-color: #f0d9b5;
 }
@@ -133,20 +140,80 @@ height: 60px;
 
 
 dialog {
-  margin: 0 auto;
-  border-radius: 8px;
   border: none;
   text-align: center;
   background-color: transparent;
+  margin: 10vh auto auto auto;
+  animation: fadeIn 0.3s ease-in-out;
 }
-.modal-content {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+dialog > div {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  background-color: white;
-  padding: 20px;
+  gap: 15px;
+  background: linear-gradient(to bottom, #f8f9fa, #dee2e6); /* Gradiente sutil */
+  padding: 25px;
+  border-radius: 12px;
+  border: 3px solid #333;
+  width: 300px;
 }
+
+/* Estilizando o título */
+dialog h2 {
+  font-family: 'Garamond', serif;
+  font-size: 22px;
+  font-weight: bold;
+  color: #222;
+}
+
+/* Inputs estilizados */
+dialog input {
+  padding: 10px;
+  border: 2px solid #333;
+  border-radius: 6px;
+  font-size: 16px;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+  transition: 0.2s;
+}
+
+dialog input:focus {
+  border-color: #daa520; /* Dourado ao focar */
+  outline: none;
+  box-shadow: 0 0 5px rgba(218, 165, 32, 0.6);
+}
+
+/* Botão estilizado */
+dialog button {
+  background: #222;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+dialog button:hover {
+  background: #daa520; /* Dourado */
+  color: #222;
+}
+
+/* Animação de entrada suave */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 
 @media (max-width: 768px) {
   #main-grid {

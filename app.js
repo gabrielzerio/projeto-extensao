@@ -395,7 +395,7 @@ function endGame() {
 
 function playersName() {
   const modal = document.getElementById("modal1");
-  modal.show();
+  modal.showModal();
   const btn = document.getElementById("startGame");
   btn.addEventListener("click", () => {
     player1Name = document.getElementById("player1").value;
