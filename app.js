@@ -278,5 +278,5 @@ createBoard();
 toggleTurn();
 
 window.onload = () => {
-  frontFunctions.showPlayersName();
+  frontFunctions.showPlayersName(player1Name, player2Name);
 };

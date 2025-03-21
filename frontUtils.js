@@ -18,7 +18,7 @@ class FunctionsFront{
         });
       }
       
-       showPlayersName() {
+       showPlayersName(player1Name, player2Name) {
         const modal = document.getElementById("modal1");
         modal.showModal();
         const btn = document.getElementById("startGame");
