@@ -108,6 +108,7 @@ function handleSquareClick(row, col) {
               `Xeque-mate! O jogador ${color === "white" ? "preto" : "branco"
               } venceu!`
             );
+            showEndGame();
           } else {
             alert(
               `O rei ${color === "white" ? "branco" : "preto"} está em xeque!`
@@ -394,14 +395,18 @@ function isCheckmate(color) {
   return true; // Nenhuma peça pode sair do xeque -> xeque-mate
 }
 
-function endGame() {
+function showEndGame() {
   const modal = document.getElementById("modal2");
   winner = currentTurn === 'white' ? player1Name : player2Name;
   winnerMessage.textContent = `Parabéns, ${winner} ! Você venceu!`;
   modal.showModal();
+  const btn = document.getElementById('restartGame');
+  btn.addEventListener('click', () => {
+    location.reload();
+  }) 
 }
 
-function playersName() {
+function showPlayersName() {
   const modal = document.getElementById("modal1");
   modal.showModal();
   const btn = document.getElementById("startGame");
@@ -417,5 +422,5 @@ createBoard();
 toggleTurn();
 
 window.onload = () => {
-  playersName();
+  showPlayersName();
 };
