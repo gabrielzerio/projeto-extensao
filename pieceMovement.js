@@ -1,0 +1,79 @@
+class PcsMvmt {
+  constructor() {
+    // nao utilizado por enquanto
+  }
+
+  isValidPawnMove(piece, from, toRow, toCol, board) {
+    const direction = piece.color === "white" ? -1 : 1;
+    const startRow = piece.color === "white" ? 6 : 1;
+
+    if (from.col === toCol && board[toRow][toCol] === null) {
+      if (toRow === from.row + direction) return true;
+
+      if (
+        from.row === startRow &&
+        toRow === from.row + 2 * direction &&
+        board[from.row + direction][toCol] === null &&
+        board[toRow][toCol] === null
+      ) {
+        return true;
+      }
+    }
+
+    if (Math.abs(from.col - toCol) === 1 && toRow === from.row + direction) {
+      if (board[toRow][toCol] && board[toRow][toCol].color !== piece.color) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  isValidRookMove(from, toRow, toCol, board) {
+    const rowDiff = Math.abs(from.row - toRow);
+    const colDiff = Math.abs(from.col - toCol);
+    return (rowDiff === 0 || colDiff === 0) && !this.isPathBlocked(from, toRow, toCol, board);
+  }
+
+  isValidBishopMove(from, toRow, toCol, board) {
+    const rowDiff = Math.abs(from.row - toRow);
+    const colDiff = Math.abs(from.col - toCol);
+    return rowDiff === colDiff && !this.isPathBlocked(from, toRow, toCol, board);
+  }
+
+  isValidQueenMove(from, toRow, toCol, board) {
+    return this.isValidRookMove(from, toRow, toCol, board) || this.isValidBishopMove(from, toRow, toCol, board);
+  }
+
+  isValidKnightMove(from, toRow, toCol) {
+    const rowDiff = Math.abs(from.row - toRow);
+    const colDiff = Math.abs(from.col - toCol);
+    return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+  }
+
+  isValidKingMove(from, toRow, toCol) {
+    const rowDiff = Math.abs(from.row - toRow);
+    const colDiff = Math.abs(from.col - toCol);
+    return rowDiff <= 1 && colDiff <= 1;
+  }
+
+  isPathBlocked(from, toRow, toCol, board) {
+    const rowStep = Math.sign(toRow - from.row);
+    const colStep = Math.sign(toCol - from.col);
+
+    let row = from.row + rowStep;
+    let col = from.col + colStep;
+
+    while (row !== toRow || col !== toCol) {
+      if (board[row][col] !== null) {
+        return true;
+      }
+      row += rowStep;
+      col += colStep;
+    }
+    return false;
+  }
+}
+
+// Exportando a classe
+export default PcsMvmt;
