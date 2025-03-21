@@ -417,6 +417,15 @@ function showPlayersName() {
   });
 }
 
+function showEndGame(){
+  const modal = document.getElementById('modal2');
+  modal.showModal();
+  const btn = document.getElementById('restartGame');
+  btn.addEventListener('click', () => {
+    location.reload();
+  })
+}
+
 initializeBoard();
 createBoard();
 toggleTurn();
