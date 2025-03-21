@@ -81,20 +81,16 @@ function pieceToSymbol(piece) {
   return symbols[piece.type][piece.color];
 }
 
-function toggleTurn() {
-  currentTurn = currentTurn === "white" ? "black" : "white";
-  document.getElementById("turn-info").textContent = `Turno: ${currentTurn === "white" ? "Jogador Branco" : "Jogador Preto"}`;
-}
-
 function handleSquareClick(row, col) {
   const piece = board[row][col];
   if (selectedPiece) {
     if (movePiece(selectedPiece, selectedPosition, row, col)) {
-      toggleTurn();
+      toggleTurn();//etapa final da movimentacao de peca
+      console.log(`${isCheckmate(currentTurn)} e cor atual ${currentTurn}`);
       selectedPiece = null;
       selectedPosition = null;
-      // Verifica o status de ambos os reis
       showAlerts()
+      // Verifica o status de ambos os reis
     } else {
       document.getElementById("move-info").textContent = "Movimento inválido. Tente novamente.";
       bgPieceColoring(false);
@@ -109,29 +105,6 @@ function handleSquareClick(row, col) {
     showPossibleMoves(piece, row, col);
     bgPieceColoring(true);
   }
-}
-
-function bgPieceColoring(mov) {
-  const pecaSelecionada = document.getElementById(
-    `${selectedPiece.position.row}-${selectedPiece.position.col}`
-  );
-  if (selectedPiece && mov) {
-    pecaSelecionada.style.backgroundColor = "lightyellow";
-    return;
-  }
-  if (pecaSelecionada.className == "white-square") {
-    pecaSelecionada.style.backgroundColor = "#f0d9b5";
-  } else {
-    pecaSelecionada.style.backgroundColor = "#b58863";
-  }
-}
-
-function removePiece(target) {
-  const colorDiv = target.color === "black" ? "black" : "white";
-  const div = document.getElementById(`${colorDiv}-pieces`);
-  const span = document.createElement("span");
-  span.innerHTML = pieceToSymbol(target);
-  div.appendChild(span);
 }
 
 function movePiece(piece, from, toRow, toCol) {
@@ -164,6 +137,35 @@ function movePiece(piece, from, toRow, toCol) {
   }
   return false;
 }
+
+function toggleTurn() {
+  currentTurn = currentTurn === "white" ? "black" : "white";
+  document.getElementById("turn-info").textContent = `Turno: ${currentTurn === "white" ? "Jogador Branco" : "Jogador Preto"}`; 
+}
+
+function bgPieceColoring(mov) {
+  const pecaSelecionada = document.getElementById(
+    `${selectedPiece.position.row}-${selectedPiece.position.col}`
+  );
+  if (selectedPiece && mov) {
+    pecaSelecionada.style.backgroundColor = "lightyellow";
+    return;
+  }
+  if (pecaSelecionada.className == "white-square") {
+    pecaSelecionada.style.backgroundColor = "#f0d9b5";
+  } else {
+    pecaSelecionada.style.backgroundColor = "#b58863";
+  }
+}
+
+function removePiece(target) {
+  const colorDiv = target.color === "black" ? "black" : "white";
+  const div = document.getElementById(`${colorDiv}-pieces`);
+  const span = document.createElement("span");
+  span.innerHTML = pieceToSymbol(target);
+  div.appendChild(span);
+}
+
 
 function showPossibleMoves(piece, row, col) {
   frontFunctions.removeHighlight();
@@ -217,10 +219,7 @@ function isKingInCheck(color) {
   const king = pieces.find((p) => p.type === "king" && p.color === color);
   if (!king) return false;
 
-  return pieces.some(
-    (p) =>
-      p.color !== color && isValidMove(p, p.position, king.position.row, king.position.col)
-  );
+  return pieces.some((p) => p.color !== color && isValidMove(p, p.position, king.position.row, king.position.col));
 }
 
 function isCheckmate(color) {
@@ -234,6 +233,7 @@ function isCheckmate(color) {
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
         if (isValidMove(piece, { row, col }, r, c)) {
+ 
           const originalPiece = board[r][c];
           const originalPosition = { ...piece.position };
 
