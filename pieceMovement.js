@@ -45,11 +45,20 @@ class PcsMvmt {
     return this.isValidRookMove(from, toRow, toCol, board) || this.isValidBishopMove(from, toRow, toCol, board);
   }
 
-  isValidKnightMove(from, toRow, toCol) {
+  isValidKnightMove(from, toRow, toCol, board) {
     const rowDiff = Math.abs(from.row - toRow);
     const colDiff = Math.abs(from.col - toCol);
-    return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+    
+    if ((rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)) {
+      // Verifica se a casa de destino não está ocupada por uma peça da mesma cor
+      if (board[toRow][toCol] === null || board[toRow][toCol].color !== board[from.row][from.col].color) {
+        return true;
+      }
+    }
+  
+    return false;
   }
+  
 
   isValidKingMove(from, toRow, toCol) {
     const rowDiff = Math.abs(from.row - toRow);

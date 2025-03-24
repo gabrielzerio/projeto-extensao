@@ -115,7 +115,7 @@ function movePiece(piece, from, toRow, toCol) {
 
   if (isKingInCheck(currentColorTurn) && !canSaveKing) {
     const king = pieces.find((p) => p.type === "king" && p.color === currentColorTurn);
-    console.log(king)
+    console.log(currentColorTurn)
     const kingDiv = document.getElementById(`${king.position.row}-${king.position.col}`);
     
     if (kingDiv) {
