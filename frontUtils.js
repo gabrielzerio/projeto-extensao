@@ -7,9 +7,9 @@ class FunctionsFront{
         });
       }
 
-       showEndGame() {
+       showEndGame(player1Name, player2Name, currentTurn) {
         const modal = document.getElementById("modal2");
-        winner = currentTurn === "white" ? player1Name : player2Name;
+        const winner = currentTurn === "white" ? player1Name : player2Name;
         winnerMessage.textContent = `Parabéns, ${winner} ! Você venceu!`;
         modal.showModal();
         const btn = document.getElementById("restartGame");
@@ -27,6 +27,11 @@ class FunctionsFront{
           player2Name = document.getElementById("player2").value;
           modal.close();
         });
+      }
+
+      canCaptureEnemyPiece(board, piece, toRow, toCol) {
+        const targetPiece = board[toRow][toCol];
+        return targetPiece && targetPiece.color !== piece.color;
       }
 
 }
