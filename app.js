@@ -109,10 +109,12 @@ function handleSquareClick(row, col) {
 
 function movePiece(piece, from, toRow, toCol) {
   // Verifica se a peça é uma das que pode salvar o rei e se está movendo para uma posição válida
+  //  const pecaAmeaca = pieces.filter((p) => p.color !== currentColorTurn && isValidMove(p, p.position, king.position.row, king.position.col));
   const canSaveKing = piecesThatCanSaveKing.some(
     (entry) => entry.piece === piece && entry.position.row === toRow && entry.position.col === toCol
   );
 
+  console.log(canSaveKing)
   if (isKingInCheck(currentColorTurn) && !canSaveKing) {
     const king = pieces.find((p) => p.type === "king" && p.color === currentColorTurn);
     console.log(currentColorTurn)
@@ -128,6 +130,7 @@ function movePiece(piece, from, toRow, toCol) {
         }, 1500); // 1500ms para a animação terminar (3 ciclos de 0.5s)
     }
     
+    // console.log(pecaAmeaca)
     return false;
 }
 
@@ -252,8 +255,6 @@ function isCheckmate(color) {
     return false; // O rei não está em xeque, então não pode ser xeque-mate
   }
 
-  const piecesThatCanSaveKing = [];
-
   // Itera sobre as peças do jogador
   for (const piece of pieces.filter((p) => p.color === color)) {
     const { row, col } = piece.position;
@@ -294,20 +295,17 @@ function isCheckmate(color) {
   return true; // Nenhuma peça pode salvar o rei -> xeque-mate
 }
 
-
-
-function showAlerts() {
-  
-    if (isKingInCheck(currentColorTurn)) {
-      if (isCheckmate(currentColorTurn)) {
-        alert(`Xeque-mate! O jogador ${currentColorTurn === "white" ? "preto" : "branco"} venceu!`);
-        frontFunctions.showEndGame(player1Name, player2Name, currentColorTurn);
+function showAlerts(){
+  ["white", "black"].forEach((color) => {
+    if (isKingInCheck(color)) {
+      if (isCheckmate(color)) {
+        alert(`Xeque-mate! O jogador ${color === "white" ? "preto" : "branco"} venceu!`);
+        showEndGame();
       } else {
-        alert(`O rei ${currentColorTurn === "white" ? "branco" : "preto"} está em xeque!`);
-        return
+        alert(`O rei ${color === "white" ? "branco" : "preto"} está em xeque!`);
       }
     }
-
+  });
 }
 
 initializeBoard();
