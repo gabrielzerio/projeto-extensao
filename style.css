@@ -230,3 +230,21 @@ dialog button:hover {
     order: 1; /* A segunda coluna vai para cima */
   }
 }
+
+
+
+@keyframes blink {
+  0% {
+    background-color: red;
+  }
+  50% {
+    background-color: transparent;
+  }
+  100% {
+    background-color: red;
+  }
+}
+
+.blink {
+  animation: blink 0.5s ease-in-out 3; /* Duração de 0.5s, animação 3 vezes */
+}
