@@ -258,7 +258,7 @@ function resetKingDefenders(){
 function isKingInCheck(color) {
   const king = pieces.find((p) => p.type === "king" && p.color === color);
   if (!king) return false;
-
+  // console.log(pieces.filter((p) => p.color !== color && isValidMove(p, p.position, king.position.row, king.position.col)))
   return pieces.some((p) => p.color !== color && isValidMove(p, p.position, king.position.row, king.position.col));
 
 }
@@ -282,10 +282,10 @@ function isCheckmate(color) {
           board[row][col] = null;
           board[r][c] = piece;
           piece.position = { row: r, col: c };
-
+            
           // Verifica se o rei ainda está em xeque após o movimento
           const stillInCheck = isKingInCheck(color);
-
+          console.log(`${piece} e ${stillInCheck}`)
           // Reverte a jogada simulada
           board[row][col] = piece;
           board[r][c] = originalPiece;
@@ -311,12 +311,11 @@ function isCheckmate(color) {
 function showAlerts(){
   
     if (isKingInCheck(currentColorTurn)) {
-      if (isCheckmate(currentColorTurn)) {
-        alert(`Xeque-mate! O jogador ${currentColorTurn === "white" ? "preto" : "branco"} venceu!`);
-        // showEndGame();
-      } else {
         alert(`O rei ${currentColorTurn === "white" ? "branco" : "preto"} está em xeque!`);
-      }
+    }
+    else if(isCheckmate(currentColorTurn)) {
+      alert(`Xeque-mate! O jogador ${currentColorTurn === "white" ? "preto" : "branco"} venceu!`);
+      // showEndGame();
     }
   
 }
