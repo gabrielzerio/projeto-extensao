@@ -87,7 +87,6 @@ function handleSquareClick(row, col) {
   const piece = board[row][col];
   if (selectedPiece) {
     if (movePiece(selectedPiece, selectedPosition, row, col)) {
-      showAlerts()
       toggleTurn();//etapa final da movimentacao de peca
       selectedPiece = null;
       selectedPosition = null;
@@ -122,22 +121,22 @@ function movePiece(piece, from, toRow, toCol) {
     const king = pieces.find((p) => p.type === "king" && p.color === currentColorTurn);
     console.log(currentColorTurn)
     const kingDiv = document.getElementById(`${king.position.row}-${king.position.col}`);
-    
+
     if (kingDiv) {
-        // Adiciona a classe de animação para piscar em vermelho
-        kingDiv.classList.add("blink");
-        
-        // Remove a classe depois de alguns segundos para parar o piscar
-        setTimeout(() => {
-            kingDiv.classList.remove("blink");
-        }, 1500); // 1500ms para a animação terminar (3 ciclos de 0.5s)
+      // Adiciona a classe de animação para piscar em vermelho
+      kingDiv.classList.add("blink");
+
+      // Remove a classe depois de alguns segundos para parar o piscar
+      setTimeout(() => {
+        kingDiv.classList.remove("blink");
+      }, 1500); // 1500ms para a animação terminar (3 ciclos de 0.5s)
     }
-    
+
     // console.log(pecaAmeaca)
     return false;
-}
+  }
 
-resetKingDefenders()
+  resetKingDefenders()
   if (isValidMove(piece, from, toRow, toCol, lastMove)) {
     const target = board[toRow][toCol];
     const pieceElement = document.getElementById(`${from.row}-${from.col}`).querySelector(".piece");
@@ -236,12 +235,12 @@ function isValidMove(piece, from, toRow, toCol, lastMove) {
 
 function isSquareUnderAttack(row, col, attackingColor) {
   for (const piece of pieces) {
-      if (piece.color === attackingColor) {
-          const from = piece.position;
-          if (isValidMove(piece, from, row, col)) {
-              return true;
-          }
+    if (piece.color === attackingColor) {
+      const from = piece.position;
+      if (isValidMove(piece, from, row, col)) {
+        return true;
       }
+    }
   }
   return false;
 }
@@ -251,8 +250,8 @@ function positionToString(row, col) {
   return `${letters[col]}${8 - row}`;
 }
 
-function resetKingDefenders(){
-  piecesThatCanSaveKing.length=0;
+function resetKingDefenders() {
+  piecesThatCanSaveKing.length = 0;
 }
 
 function isKingInCheck(color) {
@@ -262,7 +261,7 @@ function isKingInCheck(color) {
   return pieces.some((p) => p.color !== color && isValidMove(p, p.position, king.position.row, king.position.col));
 
 }
-
+  let i =0;
 function isCheckmate(color) {
   if (!isKingInCheck(color)) {
     return false; // O rei não está em xeque, então não pode ser xeque-mate
@@ -275,6 +274,7 @@ function isCheckmate(color) {
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
         if (isValidMove(piece, { row, col }, r, c)) {
+          console.log(i++)
           const originalPiece = board[r][c];
           const originalPosition = { ...piece.position };
 
@@ -282,16 +282,20 @@ function isCheckmate(color) {
           board[row][col] = null;
           board[r][c] = piece;
           piece.position = { row: r, col: c };
-            
+          console.log(board)
+          console.log(currentColorTurn)
           // Verifica se o rei ainda está em xeque após o movimento
           const stillInCheck = isKingInCheck(color);
-          console.log(`${piece} e ${stillInCheck}`)
+          if(stillInCheck){
+            console.log(piece)
+          }
           // Reverte a jogada simulada
           board[row][col] = piece;
           board[r][c] = originalPiece;
           piece.position = originalPosition;
-
+          console.log(piecesThatCanSaveKing)
           if (!stillInCheck) {
+            console.log(piecesThatCanSaveKing)
             piecesThatCanSaveKing.push({ piece, position: { row: r, col: c } });
           }
         }
@@ -309,16 +313,22 @@ function isCheckmate(color) {
 }
 
 function showAlerts(){
-  
-    if (isKingInCheck(currentColorTurn)) {
-        alert(`O rei ${currentColorTurn === "white" ? "branco" : "preto"} está em xeque!`);
+  ["white", "black"].forEach((color) => {
+    if (isKingInCheck(color)) {
+      if (isCheckmate(color)) {
+        alert(`Xeque-mate! O jogador ${color === "white" ? "preto" : "branco"} venceu!`);
+        showEndGame();
+      } 
+      else if(currentColorTurn != color){
+        alert("xeque-mate?")
+      } 
+      else {
+        alert(`O rei ${color === "white" ? "branco" : "preto"} está em xeque!`);
+      }
     }
-    else if(isCheckmate(currentColorTurn)) {
-      alert(`Xeque-mate! O jogador ${currentColorTurn === "white" ? "preto" : "branco"} venceu!`);
-      // showEndGame();
-    }
-  
+  });
 }
+
 
 initializeBoard();
 createBoard();
