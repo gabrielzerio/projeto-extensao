@@ -30,6 +30,7 @@ const pieces = [
 
 let player1Name = ""; //peças brancas
 let player2Name = ""; //peças pretas
+let lastMove = null;
 let selectedPiece = null;
 let selectedPosition = null;
 let currentColorTurn = "black";
@@ -86,6 +87,7 @@ function handleSquareClick(row, col) {
   const piece = board[row][col];
   if (selectedPiece) {
     if (movePiece(selectedPiece, selectedPosition, row, col)) {
+      showAlerts()
       toggleTurn();//etapa final da movimentacao de peca
       selectedPiece = null;
       selectedPosition = null;
@@ -110,6 +112,7 @@ function handleSquareClick(row, col) {
 function movePiece(piece, from, toRow, toCol) {
   // Verifica se a peça é uma das que pode salvar o rei e se está movendo para uma posição válida
   //  const pecaAmeaca = pieces.filter((p) => p.color !== currentColorTurn && isValidMove(p, p.position, king.position.row, king.position.col));
+
   const canSaveKing = piecesThatCanSaveKing.some(
     (entry) => entry.piece === piece && entry.position.row === toRow && entry.position.col === toCol
   );
@@ -134,8 +137,8 @@ function movePiece(piece, from, toRow, toCol) {
     return false;
 }
 
-// resetKingDefenders()
-  if (isValidMove(piece, from, toRow, toCol)) {
+resetKingDefenders()
+  if (isValidMove(piece, from, toRow, toCol, lastMove)) {
     const target = board[toRow][toCol];
     const pieceElement = document.getElementById(`${from.row}-${from.col}`).querySelector(".piece");
 
@@ -209,13 +212,13 @@ function showPossibleMoves(piece, row, col) {
 }
 
 
-function isValidMove(piece, from, toRow, toCol) {
+function isValidMove(piece, from, toRow, toCol, lastMove) {
   const targetPiece = board[toRow][toCol];
   if (targetPiece && targetPiece.color === piece.color) return false;
 
   switch (piece.type) {
     case "pawn":
-      return movimentos.isValidPawnMove(piece, from, toRow, toCol, board);
+      return movimentos.isValidPawnMove(piece, from, toRow, toCol, board, lastMove);
     case "rook":
       return movimentos.isValidRookMove(from, toRow, toCol, board);
     case "knight":
@@ -225,13 +228,23 @@ function isValidMove(piece, from, toRow, toCol) {
     case "queen":
       return movimentos.isValidQueenMove(from, toRow, toCol, board);
     case "king":
-      return movimentos.isValidKingMove(from, toRow, toCol, board);
+      return movimentos.isValidKingMove(from, toRow, toCol, board, isSquareUnderAttack);
     default: ''
       return false;
   }
 }
 
-
+function isSquareUnderAttack(row, col, attackingColor) {
+  for (const piece of pieces) {
+      if (piece.color === attackingColor) {
+          const from = piece.position;
+          if (isValidMove(piece, from, row, col)) {
+              return true;
+          }
+      }
+  }
+  return false;
+}
 
 function positionToString(row, col) {
   const letters = "abcdefgh";
@@ -296,16 +309,16 @@ function isCheckmate(color) {
 }
 
 function showAlerts(){
-  ["white", "black"].forEach((color) => {
-    if (isKingInCheck(color)) {
-      if (isCheckmate(color)) {
-        alert(`Xeque-mate! O jogador ${color === "white" ? "preto" : "branco"} venceu!`);
-        showEndGame();
+  
+    if (isKingInCheck(currentColorTurn)) {
+      if (isCheckmate(currentColorTurn)) {
+        alert(`Xeque-mate! O jogador ${currentColorTurn === "white" ? "preto" : "branco"} venceu!`);
+        // showEndGame();
       } else {
-        alert(`O rei ${color === "white" ? "branco" : "preto"} está em xeque!`);
+        alert(`O rei ${currentColorTurn === "white" ? "branco" : "preto"} está em xeque!`);
       }
     }
-  });
+  
 }
 
 initializeBoard();

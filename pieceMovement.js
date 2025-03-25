@@ -3,31 +3,46 @@ class PcsMvmt {
     // nao utilizado por enquanto
   }
 
-  isValidPawnMove(piece, from, toRow, toCol, board) {
+  isValidPawnMove(piece, from, toRow, toCol, board, lastMove) {
     const direction = piece.color === "white" ? -1 : 1;
     const startRow = piece.color === "white" ? 6 : 1;
 
+    // Movimento para frente (uma casa)
     if (from.col === toCol && board[toRow][toCol] === null) {
-      if (toRow === from.row + direction) return true;
+        if (toRow === from.row + direction) return true;
 
-      if (
-        from.row === startRow &&
-        toRow === from.row + 2 * direction &&
-        board[from.row + direction][toCol] === null &&
-        board[toRow][toCol] === null
-      ) {
-        return true;
-      }
+        // Movimento para frente (duas casas)
+        if (
+            from.row === startRow &&
+            toRow === from.row + 2 * direction &&
+            board[from.row + direction][toCol] === null &&
+            board[toRow][toCol] === null
+        ) {
+            return true;
+        }
     }
 
+    // Captura diagonal
     if (Math.abs(from.col - toCol) === 1 && toRow === from.row + direction) {
-      if (board[toRow][toCol] && board[toRow][toCol].color !== piece.color) {
-        return true;
-      }
+        if (board[toRow][toCol] && board[toRow][toCol].color !== piece.color) {
+            return true;
+        }
+
+        // Captura "en passant"
+        if (lastMove && lastMove.piece.type === 'pawn' &&
+            lastMove.from.row === startRow + (direction * -2) && // Peão adversário moveu duas casas da inicial
+            lastMove.to.row === startRow + (direction * -1) &&   // para a linha adjacente
+            lastMove.to.col === toCol &&                         // na coluna de destino
+            from.row === startRow + (direction * -1) &&         // Peão atual está na linha correta
+            Math.abs(from.col - toCol) === 1 &&                 // Movimento diagonal de uma casa
+            board[toRow][toCol] === null                         // A casa de destino está vazia
+        ) {
+            return true;
+        }
     }
 
     return false;
-  }
+}
 
   isValidRookMove(from, toRow, toCol, board) {
     const rowDiff = Math.abs(from.row - toRow);
@@ -60,11 +75,19 @@ class PcsMvmt {
   }
   
 
-  isValidKingMove(from, toRow, toCol) {
+  isValidKingMove(from, toRow, toCol, board, isSquareUnderAttack) {
     const rowDiff = Math.abs(from.row - toRow);
     const colDiff = Math.abs(from.col - toCol);
-    return rowDiff <= 1 && colDiff <= 1;
-  }
+
+    if (rowDiff <= 1 && colDiff <= 1) {
+        const kingColor = board[from.row][from.col].color;
+        const attackingColor = kingColor === "white" ? "black" : "white";
+        if (!isSquareUnderAttack(toRow, toCol, attackingColor)) {
+            return true;
+        }
+    }
+    return false;
+}
 
   isPathBlocked(from, toRow, toCol, board) {
     const rowStep = Math.sign(toRow - from.row);
