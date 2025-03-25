@@ -261,12 +261,12 @@ function isKingInCheck(color) {
   return pieces.some((p) => p.color !== color && isValidMove(p, p.position, king.position.row, king.position.col));
 
 }
-  let i =0;
+
 function isCheckmate(color) {
   if (!isKingInCheck(color)) {
     return false; // O rei não está em xeque, então não pode ser xeque-mate
   }
-
+  
   // Itera sobre as peças do jogador
   for (const piece of pieces.filter((p) => p.color === color)) {
     const { row, col } = piece.position;
@@ -274,7 +274,7 @@ function isCheckmate(color) {
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
         if (isValidMove(piece, { row, col }, r, c)) {
-          console.log(i++)
+          console.log(`Black ${piece.type} at ${positionToString(row, col)} can move to ${positionToString(r, c)}`);
           const originalPiece = board[r][c];
           const originalPosition = { ...piece.position };
 
@@ -282,18 +282,17 @@ function isCheckmate(color) {
           board[row][col] = null;
           board[r][c] = piece;
           piece.position = { row: r, col: c };
-          console.log(board)
-          console.log(currentColorTurn)
+          // console.log(board)
+          // console.log(currentColorTurn)
           // Verifica se o rei ainda está em xeque após o movimento
           const stillInCheck = isKingInCheck(color);
-          if(stillInCheck){
-            console.log(piece)
-          }
+         
           // Reverte a jogada simulada
           board[row][col] = piece;
           board[r][c] = originalPiece;
           piece.position = originalPosition;
-          console.log(piecesThatCanSaveKing)
+          console.log(`After moving to ${positionToString(r, c)}, is king still in check? ${stillInCheck}`);
+          // console.log(piecesThatCanSaveKing)
           if (!stillInCheck) {
             console.log(piecesThatCanSaveKing)
             piecesThatCanSaveKing.push({ piece, position: { row: r, col: c } });
