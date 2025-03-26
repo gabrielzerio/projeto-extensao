@@ -33,7 +33,6 @@ let player2Name = ""; //peças pretas
 let selectedPiece = null;
 let selectedPosition = null;
 let currentColorTurn = "black";
-const piecesThatCanSaveKing = []; // Array para armazenar as peças e suas posições
 
 function initializeBoard() {
   board.forEach((row) => row.fill(null));
@@ -108,62 +107,84 @@ function handleSquareClick(row, col) {
 }
 
 function movePiece(piece, from, toRow, toCol) {
-  // Verifica se a peça é uma das que pode salvar o rei e se está movendo para uma posição válida
-  //  const pecaAmeaca = pieces.filter((p) => p.color !== currentColorTurn && isValidMove(p, p.position, king.position.row, king.position.col));
-  const canSaveKing = piecesThatCanSaveKing.some(
-    (entry) => entry.piece === piece && entry.position.row === toRow && entry.position.col === toCol
-  );
-
-  console.log(canSaveKing)
-  if (isKingInCheck(currentColorTurn) && !canSaveKing) {
-    const king = pieces.find((p) => p.type === "king" && p.color === currentColorTurn);
-    console.log(currentColorTurn)
-    const kingDiv = document.getElementById(`${king.position.row}-${king.position.col}`);
-    
-    if (kingDiv) {
-        // Adiciona a classe de animação para piscar em vermelho
-        kingDiv.classList.add("blink");
-        
-        // Remove a classe depois de alguns segundos para parar o piscar
-        setTimeout(() => {
-            kingDiv.classList.remove("blink");
-        }, 1500); // 1500ms para a animação terminar (3 ciclos de 0.5s)
-    }
-    
-    // console.log(pecaAmeaca)
-    return false;
-}
-
-// resetKingDefenders()
   if (isValidMove(piece, from, toRow, toCol)) {
-    const target = board[toRow][toCol];
-    const pieceElement = document.getElementById(`${from.row}-${from.col}`).querySelector(".piece");
+    // Simula o movimento para verificar se o rei ficará em xeque
+    const originalPiece = board[toRow][toCol];
+    const originalPosition = { ...piece.position };
 
-    if (target) {
-      removePiece(target);
-      pieces.splice(pieces.indexOf(target), 1);
+    // Faz o movimento temporário
+    board[from.row][from.col] = null;
+    board[toRow][toCol] = piece;
+    piece.position = { row: toRow, col: toCol };
+
+    // Verifica se o rei está em xeque após o movimento
+    const kingInCheck = isKingInCheck(piece.color);
+
+    // Reverte o movimento temporário
+    board[from.row][from.col] = piece;
+    board[toRow][toCol] = originalPiece;
+    piece.position = originalPosition;
+
+    // Permite o movimento se ele captura a peça que ameaça o rei
+    if (kingInCheck) {
+      document.getElementById('move-info').textContent = 'Movimento inválido: o rei ficaria em xeque.';
+      return false;
+    }
+
+    // Executa o movimento se for válido
+    if (originalPiece) {
+      removePiece(originalPiece);
+      pieces.splice(pieces.indexOf(originalPiece), 1);
     }
 
     board[from.row][from.col] = null;
     board[toRow][toCol] = piece;
     piece.position = { row: toRow, col: toCol };
 
-    const squareSize = 80; // Ajuste conforme necessário
-    const deltaX = (toCol - from.col) * squareSize;
-    const deltaY = (toRow - from.row) * squareSize;
-
-    pieceElement.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-
-    setTimeout(() => {
-      pieceElement.style.transform = "";
-      pieceElement.parentElement.id = `${toRow}-${toCol}`;
-      createBoard();
-    }, 300);
-    document.getElementById("move-info").textContent = `Peça movida para ${positionToString(toRow, toCol).toUpperCase()}`;
+    createBoard();
+    document.getElementById('move-info').textContent = `Peça movida para ${positionToString(toRow, toCol).toUpperCase()}`;
     return true;
   }
 
+  document.getElementById('move-info').textContent = 'Movimento inválido. Tente novamente.';
   return false;
+}
+
+function showPossibleMoves(piece, row, col) {
+  frontFunctions.removeHighlight(); // Remove highlights de movimentos anteriores
+
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      if (isValidMove(piece, { row, col }, r, c)) {
+        // Simula o movimento para verificar se o rei ficará em xeque
+        const originalPiece = board[r][c];
+        const originalPosition = { ...piece.position };
+
+        // Faz o movimento temporário
+        board[row][col] = null;
+        board[r][c] = piece;
+        piece.position = { row: r, col: c };
+        
+        // Verifica se o rei está em xeque após o movimento
+        const kingInCheck = isKingInCheck(piece.color);
+        console.log(pieces)
+        console.log(board.map(row => row.map(p => p ? p.type : null)))
+        console.log(kingInCheck)
+        // Reverte o movimento temporário
+        board[row][col] = piece;
+        board[r][c] = originalPiece;
+        piece.position = originalPosition;
+
+        // Apenas destaca o quadrado se o movimento não expuser o rei ao xeque
+        if (!kingInCheck) {
+          const square = document.getElementById(`${r}-${c}`);
+          square.classList.add(
+            frontFunctions.canCaptureEnemyPiece(board, piece, r, c) ? 'capture-highlight' : 'highlight'
+          );
+        }
+      }
+    }
+  }
 }
 
 
@@ -195,18 +216,7 @@ function removePiece(target) {
 }
 
 
-function showPossibleMoves(piece, row, col) {
-  frontFunctions.removeHighlight();
-  for (let r = 0; r < 8; r++) {
-    for (let c = 0; c < 8; c++) {
-      if (isValidMove(piece, { row, col }, r, c)) {
-        const square = document.getElementById(`${r}-${c}`);
-        square.classList.add(frontFunctions.canCaptureEnemyPiece(board, piece, r, c) ? "capture-highlight" : "highlight");
 
-      }
-    }
-  }
-}
 
 
 function isValidMove(piece, from, toRow, toCol) {
@@ -243,11 +253,34 @@ function resetKingDefenders(){
 }
 
 function isKingInCheck(color) {
-  const king = pieces.find((p) => p.type === "king" && p.color === color);
-  if (!king) return false;
+  // Encontra a posição do rei no tabuleiro
+  let kingPosition = null;
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = board[row][col];
+      if (piece && piece.type === 'king' && piece.color === color) {
+        kingPosition = { row, col };
+        break;
+      }
+    }
+    if (kingPosition) break;
+  }
 
-  return pieces.some((p) => p.color !== color && isValidMove(p, p.position, king.position.row, king.position.col));
+  if (!kingPosition) return false; // Rei não encontrado (caso extremo)
 
+  // Verifica se alguma peça inimiga pode atacar a posição do rei
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = board[row][col];
+      if (piece && piece.color !== color) {
+        if (isValidMove(piece, { row, col }, kingPosition.row, kingPosition.col)) {
+          return true; // O rei está em xeque
+        }
+      }
+    }
+  }
+
+  return false; // O rei não está em xeque
 }
 
 function isCheckmate(color) {
@@ -255,14 +288,14 @@ function isCheckmate(color) {
     return false; // O rei não está em xeque, então não pode ser xeque-mate
   }
 
-  // Itera sobre as peças do jogador
-  for (const piece of pieces.filter((p) => p.color === color)) {
+  // Para cada peça do jogador em xeque, verifica se há algum movimento válido
+  for (const piece of pieces.filter(p => p.color === color)) {
     const { row, col } = piece.position;
 
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
         if (isValidMove(piece, { row, col }, r, c)) {
-          const originalPiece = board[r][c];
+          const originalPiece = board[r][c]; 
           const originalPosition = { ...piece.position };
 
           // Simula o movimento
@@ -270,7 +303,6 @@ function isCheckmate(color) {
           board[r][c] = piece;
           piece.position = { row: r, col: c };
 
-          // Verifica se o rei ainda está em xeque após o movimento
           const stillInCheck = isKingInCheck(color);
 
           // Reverte a jogada simulada
@@ -279,21 +311,16 @@ function isCheckmate(color) {
           piece.position = originalPosition;
 
           if (!stillInCheck) {
-            piecesThatCanSaveKing.push({ piece, position: { row: r, col: c } });
+            return false; // Existe pelo menos um movimento que tira o rei do xeque
           }
         }
       }
     }
   }
 
-  // Se houver peças que podem salvar o rei, não é xeque-mate
-  if (piecesThatCanSaveKing.length > 0) {
-    console.log("Peças que podem salvar o rei com as posições:", piecesThatCanSaveKing);
-    return false; // Existem peças que podem salvar o rei, logo não é xeque-mate
-  }
-
-  return true; // Nenhuma peça pode salvar o rei -> xeque-mate
+  return true; // Nenhuma peça pode sair do xeque -> xeque-mate
 }
+
 
 function showAlerts(){
   ["white", "black"].forEach((color) => {
