@@ -1,15 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jogo de Xadrez</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div id="turn-info"></div>
-    <div class="dead-pieces"><div id="black-pieces"></div> <div id="white-pieces"></div></div>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jogo de Xadrez</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="main-grid">
+    <div class="dead-pieces">
+      <div id="black-pieces"></div>
+      <div id="white-pieces"></div>
+    </div>
     <div class="chess-container">
+      <div id="turn-info"></div>
       <div>
         <div id="board-wrapper" class="board-wrapper">
           <div id="board" class="chess-board"></div>
@@ -41,7 +47,27 @@
           <p id="hint"></p>
         </div>
       </div>
-    </div>
-    <script src="app.js"></script>
-  </body>
+    </div> <!-- Fechando corretamente a div "chess-container" -->
+  </div> <!-- Fechando corretamente a div "main-grid" -->
+
+  <dialog id="modal2">
+    <div>
+    <h2>Fim de Jogo!</h2>
+    <p id="winnerMessage"></p>
+    <button id="restartGame">Jogar Novamente</button>
+  </div>
+  </dialog>
+
+  <dialog id="modal1">
+    <div>
+    <h2>Digite os nomes dos jogadores</h2>
+    <input type="text" id="player1" placeholder="Jogador das peças brancas">
+    <input type="text" id="player2" placeholder="Jogador das peças pretas">
+    <button id="startGame">Começar Jogo</button>
+  </div>
+  </dialog>
+
+  <script type="module" src="app.js"></script>
+</body>
+
 </html>

@@ -5,48 +5,48 @@
 }
 
 body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   height: 100vh;
-  width: 100vw;
-  gap: 40px;
-  flex-direction: column;
   background-color: #f0f0f0;
   font-family: Arial, sans-serif;
+}
 
+#main-grid{
+  display: grid;
+  gap: 50px;
+  grid-template-columns:1fr 2fr;
 }
 
 .chess-container {
   display: flex;
+  width: fit-content;
+  gap: 40px;
   flex-direction: column;
-  align-items: center;
 }
 
 #turn-info{
   background-color: #f0d9b5;
   padding: 20px;
-  width: 488px;
+  /* width: 488px; */
   font-size: large;
-  top: 50px;
   text-align: center;
   border-radius: 10px;
 }
 
 .dead-pieces{
-  font-size: 40px;
-  position: absolute;
+  justify-self: end;
+  align-self: center;
+  
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-self: center;
-   margin-right: 800px;
   padding: 20px;
   height: 500px;
   width: 200px;
-  background-color: #757575;
   border-radius: 10px;
+  font-size: 40px;
+  background-color: #757575;
 }
+
 .dead-pieces > div{
   display: flex;
   flex-wrap: wrap;
@@ -59,20 +59,31 @@ body {
 
 .chess-board {
   display: grid;
-  grid-template-columns: repeat(8, 60px);
-  grid-template-rows: repeat(8, 60px);
+  grid-template-columns: repeat(8, 80px);
+  grid-template-rows: repeat(8, 80px);
   border: 4px solid #333; 
 }
 
 .chess-board div {
-width: 60px;
-height: 60px;
+  width: 80px;
+  height: 80px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  font-size: 40px;
-  cursor: pointer;
+  justify-content: center;
+  position: relative; /* Mantém as peças alinhadas corretamente */
 }
+
+.piece {
+  transition: transform 0.3s ease-in-out; /* Apenas a peça se move */
+  position: absolute; /* Permite mover sem afetar a célula */
+  font-size: 40px; /* Ajuste o tamanho da peça */
+}
+
+.chess-board div {
+  position: relative; /* Permite animação de deslocamento */
+  transition: transform 0.3s ease-in-out; /* Animação suave */
+}
+
 
 .white-square {
   background-color: #f0d9b5;
@@ -83,7 +94,6 @@ height: 60px;
 }
 
 .info-panel {
-  margin-top: 20px;
   text-align: center;
 }
 
@@ -129,4 +139,112 @@ height: 60px;
 
 .capture-highlight {
   background-color: rgba(255, 0, 0, 0.5);  /* Vermelho claro para indicar captura possível */
+}
+
+
+dialog {
+  border: none;
+  text-align: center;
+  background-color: transparent;
+  margin: 10vh auto auto auto;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+dialog > div {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: linear-gradient(to bottom, #f8f9fa, #dee2e6); /* Gradiente sutil */
+  padding: 25px;
+  border-radius: 12px;
+  border: 3px solid #333;
+  width: 300px;
+}
+
+/* Estilizando o título */
+dialog h2 {
+  font-family: 'Garamond', serif;
+  font-size: 22px;
+  font-weight: bold;
+  color: #222;
+}
+
+/* Inputs estilizados */
+dialog input {
+  padding: 10px;
+  border: 2px solid #333;
+  border-radius: 6px;
+  font-size: 16px;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+  transition: 0.2s;
+}
+
+dialog input:focus {
+  border-color: #daa520; /* Dourado ao focar */
+  outline: none;
+  box-shadow: 0 0 5px rgba(218, 165, 32, 0.6);
+}
+
+/* Botão estilizado */
+dialog button {
+  background: #222;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+dialog button:hover {
+  background: #daa520; /* Dourado */
+  color: #222;
+}
+
+/* Animação de entrada suave */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+@media (max-width: 768px) {
+  #main-grid {
+    grid-template-columns: 1fr; /* Coloca ambas as colunas em uma única linha */
+  }
+  #main-grid > .dead-pieces {
+    order: 2; /* A primeira coluna vai para baixo */
+    justify-self: flex-start;
+  }
+  #main-grid > .chess-container {
+    order: 1; /* A segunda coluna vai para cima */
+  }
+}
+
+
+
+@keyframes blink {
+  0% {
+    background-color: red;
+  }
+  50% {
+    background-color: transparent;
+  }
+  100% {
+    background-color: red;
+  }
+}
+
+.blink {
+  animation: blink 0.5s ease-in-out 3; /* Duração de 0.5s, animação 3 vezes */
 }
