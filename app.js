@@ -248,10 +248,6 @@ function positionToString(row, col) {
   return `${letters[col]}${8 - row}`;
 }
 
-function resetKingDefenders(){
-  piecesThatCanSaveKing.length=0;
-}
-
 function isKingInCheck(color) {
   // Encontra a posição do rei no tabuleiro
   let kingPosition = null;
@@ -327,7 +323,7 @@ function showAlerts(){
     if (isKingInCheck(color)) {
       if (isCheckmate(color)) {
         alert(`Xeque-mate! O jogador ${color === "white" ? "preto" : "branco"} venceu!`);
-        showEndGame();
+        frontFunctions.showEndGame();
       } else {
         alert(`O rei ${color === "white" ? "branco" : "preto"} está em xeque!`);
       }
