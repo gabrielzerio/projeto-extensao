@@ -141,7 +141,18 @@ function movePiece(piece, from, toRow, toCol) {
     board[toRow][toCol] = piece;
     piece.position = { row: toRow, col: toCol };
 
-    createBoard();
+    const pieceElement = document.getElementById(`${from.row}-${from.col}`).querySelector(".piece");
+    const squareSize = 80; // Ajuste conforme necessário
+     const deltaX = (toCol - from.col) * squareSize;
+     const deltaY = (toRow - from.row) * squareSize;
+ 
+     pieceElement.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+ 
+     setTimeout(() => {
+       pieceElement.style.transform = "";
+       pieceElement.parentElement.id = `${toRow}-${toCol}`;
+       createBoard();
+     }, 300);
     document.getElementById('move-info').textContent = `Peça movida para ${positionToString(toRow, toCol).toUpperCase()}`;
     return true;
   }
