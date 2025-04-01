@@ -33,6 +33,7 @@ let player2Name = ""; //peças pretas
 let selectedPiece = null;
 let selectedPosition = null;
 let currentColorTurn = "black";
+let enPassantTarget = null;
 
 function initializeBoard() {
   board.forEach((row) => row.fill(null));
@@ -108,57 +109,87 @@ function handleSquareClick(row, col) {
 
 function movePiece(piece, from, toRow, toCol) {
   if (isValidMove(piece, from, toRow, toCol)) {
-    // Simula o movimento para verificar se o rei ficará em xeque
     const originalPiece = board[toRow][toCol];
     const originalPosition = { ...piece.position };
+
+    // Verifica se é um movimento en passant
+    const isEnPassantMove = piece.type === "pawn" && enPassantTarget && toRow === enPassantTarget.row && toCol === enPassantTarget.col;
+    
+    // Guarda referência ao peão que será capturado por en passant
+    let capturedPawn = null;
+    if (isEnPassantMove) {
+      const capturedPawnRow = piece.color === "white" ? toRow + 1 : toRow - 1;
+      capturedPawn = board[capturedPawnRow][toCol];
+    }
 
     // Faz o movimento temporário
     board[from.row][from.col] = null;
     board[toRow][toCol] = piece;
     piece.position = { row: toRow, col: toCol };
 
+    // Remove o peão capturado no en passant
+    if (isEnPassantMove) {
+      const capturedPawnRow = piece.color === "white" ? toRow + 1 : toRow - 1;
+      board[capturedPawnRow][toCol] = null;
+      removePiece(capturedPawn);
+      pieces.splice(pieces.indexOf(capturedPawn), 1);
+    }
+
     // Verifica se o rei está em xeque após o movimento
     const kingInCheck = isKingInCheck(piece.color);
 
-    // Reverte o movimento temporário
-    board[from.row][from.col] = piece;
-    board[toRow][toCol] = originalPiece;
-    piece.position = originalPosition;
-
-    // Permite o movimento se ele captura a peça que ameaça o rei
+    // Reverte o movimento se deixar o rei em xeque
     if (kingInCheck) {
+      board[from.row][from.col] = piece;
+      board[toRow][toCol] = originalPiece;
+      piece.position = originalPosition;
+      
+      // Restaura o peão capturado por en passant
+      if (isEnPassantMove) {
+        const capturedPawnRow = piece.color === "white" ? toRow + 1 : toRow - 1;
+        board[capturedPawnRow][toCol] = capturedPawn;
+      }
+      
       document.getElementById('move-info').textContent = 'Movimento inválido: o rei ficaria em xeque.';
       return false;
     }
 
-    // Executa o movimento se for válido
+    // Define o alvo do en passant se for um movimento duplo de peão
+    if (piece.type === "pawn" && Math.abs(from.row - toRow) === 2) {
+      enPassantTarget = {row: (from.row + toRow) / 2, col: toCol};
+    } else {
+      enPassantTarget = null;
+    }
+
+    // Remove a peça capturada normalmente
     if (originalPiece) {
       removePiece(originalPiece);
       pieces.splice(pieces.indexOf(originalPiece), 1);
     }
 
-    board[from.row][from.col] = null;
-    board[toRow][toCol] = piece;
-    piece.position = { row: toRow, col: toCol };
-
-    const pieceElement = document.getElementById(`${from.row}-${from.col}`).querySelector(".piece");
-    const squareSize = 80; // Ajuste conforme necessário
-     const deltaX = (toCol - from.col) * squareSize;
-     const deltaY = (toRow - from.row) * squareSize;
- 
-     pieceElement.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
- 
-     setTimeout(() => {
-       pieceElement.style.transform = "";
-       pieceElement.parentElement.id = `${toRow}-${toCol}`;
-       createBoard();
-     }, 300);
-    document.getElementById('move-info').textContent = `Peça movida para ${positionToString(toRow, toCol).toUpperCase()}`;
+    // Atualiza o tabuleiro visualmente
+    movePieceAnimation(toRow, toCol, from);
     return true;
   }
 
   document.getElementById('move-info').textContent = 'Movimento inválido. Tente novamente.';
   return false;
+}
+
+function movePieceAnimation(toRow, toCol, from) {
+  const pieceElement = document.getElementById(`${from.row}-${from.col}`).querySelector(".piece");
+  const squareSize = 80; // Ajuste conforme necessário
+  const deltaX = (toCol - from.col) * squareSize;
+  const deltaY = (toRow - from.row) * squareSize;
+
+  pieceElement.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+  setTimeout(() => {
+    pieceElement.style.transform = "";
+    pieceElement.parentElement.id = `${toRow}-${toCol}`;
+    createBoard();
+  }, 300);
+  document.getElementById('move-info').textContent = `Peça movida para ${positionToString(toRow, toCol).toUpperCase()}`;
 }
 
 function showPossibleMoves(piece, row, col) {
@@ -178,9 +209,7 @@ function showPossibleMoves(piece, row, col) {
         
         // Verifica se o rei está em xeque após o movimento
         const kingInCheck = isKingInCheck(piece.color);
-        console.log(pieces)
-        console.log(board.map(row => row.map(p => p ? p.type : null)))
-        console.log(kingInCheck)
+        // console.log(board.map(row => row.map(p => p ? p.type : null)))
         // Reverte o movimento temporário
         board[row][col] = piece;
         board[r][c] = originalPiece;
@@ -236,7 +265,7 @@ function isValidMove(piece, from, toRow, toCol) {
 
   switch (piece.type) {
     case "pawn":
-      return movimentos.isValidPawnMove(piece, from, toRow, toCol, board);
+      return movimentos.isValidPawnMove(piece, from, toRow, toCol, board, enPassantTarget);
     case "rook":
       return movimentos.isValidRookMove(from, toRow, toCol, board);
     case "knight":
