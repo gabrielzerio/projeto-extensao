@@ -82,10 +82,10 @@ function pieceToSymbol(piece) {
 
 
 
-function handleSquareClick(row, col) {
+async function handleSquareClick(row, col) {
   const piece = board[row][col];
   if (selectedPiece) {
-    if (movePiece(selectedPiece, selectedPosition, row, col)) {
+    if (await movePiece(selectedPiece, selectedPosition, row, col)) {
       toggleTurn();//etapa final da movimentacao de peca
       selectedPiece = null;
       selectedPosition = null;
@@ -106,7 +106,7 @@ function handleSquareClick(row, col) {
     bgPieceColoring(true);
   }
 }
-async function pawnPromotion(piece, toRow, toCol) {
+ async function pawnPromotion(piece, toRow, toCol) {
   if (piece.type === "pawn" && (toRow === 0 || toRow === 7)) {
     const promotedPiece = await frontFunctions.showPromotionDialog(piece.color, toRow, toCol, pieceToSymbol);
     
@@ -119,9 +119,9 @@ async function pawnPromotion(piece, toRow, toCol) {
   }
 }
 
-function movePiece(piece, from, toRow, toCol) {
+async function movePiece(piece, from, toRow, toCol) {
   if (isValidMove(piece, from, toRow, toCol)) {
-    pawnPromotion(piece, toRow, toCol); // Chama a função de promoção de peão
+    await pawnPromotion(piece, toRow, toCol); // Chama a função de promoção de peão
     const originalPiece = board[toRow][toCol];
     const originalPosition = { ...piece.position };
     

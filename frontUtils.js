@@ -34,7 +34,7 @@ class FunctionsFront {
     return targetPiece && targetPiece.color !== piece.color;
   }
 
-  async showPromotionDialog(color, row, col, pieceToSymbol) {
+  showPromotionDialog(color, row, col, pieceToSymbol) {
     const modal = document.getElementById("promotion-modal");
 
     // Calcula a posição do modal
