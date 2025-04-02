@@ -108,7 +108,7 @@ function handleSquareClick(row, col) {
 }
 async function pawnPromotion(piece, toRow, toCol) {
   if (piece.type === "pawn" && (toRow === 0 || toRow === 7)) {
-    const promotedPiece = await frontFunctions.showPromotionDialog(piece.color, toRow, toCol);
+    const promotedPiece = await frontFunctions.showPromotionDialog(piece.color, toRow, toCol, pieceToSymbol);
     
     // Atualiza a peça com o novo tipo
     piece.type = promotedPiece.type;
