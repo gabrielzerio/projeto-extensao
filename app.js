@@ -106,12 +106,25 @@ function handleSquareClick(row, col) {
     bgPieceColoring(true);
   }
 }
+async function pawnPromotion(piece, toRow, toCol) {
+  if (piece.type === "pawn" && (toRow === 0 || toRow === 7)) {
+    const promotedPiece = await frontFunctions.showPromotionDialog(piece.color, toRow, toCol);
+    
+    // Atualiza a peça com o novo tipo
+    piece.type = promotedPiece.type;
+    
+    // Atualiza o visual da peça
+    const pieceElement = document.getElementById(`${toRow}-${toCol}`).querySelector(".piece");
+    pieceElement.innerHTML = pieceToSymbol(piece);
+  }
+}
 
 function movePiece(piece, from, toRow, toCol) {
   if (isValidMove(piece, from, toRow, toCol)) {
+    pawnPromotion(piece, toRow, toCol); // Chama a função de promoção de peão
     const originalPiece = board[toRow][toCol];
     const originalPosition = { ...piece.position };
-
+    
     // Verifica se é um movimento en passant
     const isEnPassantMove = piece.type === "pawn" && enPassantTarget && toRow === enPassantTarget.row && toCol === enPassantTarget.col;
     
@@ -166,7 +179,7 @@ function movePiece(piece, from, toRow, toCol) {
       removePiece(originalPiece);
       pieces.splice(pieces.indexOf(originalPiece), 1);
     }
-
+    
     // Atualiza o tabuleiro visualmente
     movePieceAnimation(toRow, toCol, from);
     return true;
@@ -209,7 +222,7 @@ function showPossibleMoves(piece, row, col) {
         
         // Verifica se o rei está em xeque após o movimento
         const kingInCheck = isKingInCheck(piece.color);
-        // console.log(board.map(row => row.map(p => p ? p.type : null)))
+         console.log(board.map(row => row.map(p => p ? p.type : null)))
         // Reverte o movimento temporário
         board[row][col] = piece;
         board[r][c] = originalPiece;

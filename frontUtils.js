@@ -33,6 +33,46 @@ class FunctionsFront {
     const targetPiece = board[toRow][toCol];
     return targetPiece && targetPiece.color !== piece.color;
   }
+
+  async showPromotionDialog(color, row, col) {
+    const modal = document.getElementById("promotion-modal");
+
+    // Calcula a posição do modal
+    const square = document.getElementById(`${row}-${col}`);
+    const squareRect = square.getBoundingClientRect();
+    
+    // Posiciona o modal próximo ao quadrado do peão
+    modal.style.left = `${squareRect.left}px`;
+    modal.style.top = color === 'white' ? 
+      `${squareRect.top - 60}px` : 
+      `${squareRect.bottom}px`;
+    
+    modal.showModal();
+
+    return new Promise((resolve) => {
+      const buttons = modal.querySelectorAll(".piece-btn");
+      
+      const handleClick = (event) => {
+        const selectedPiece = event.target.dataset.piece;
+        buttons.forEach(btn => btn.removeEventListener("click", handleClick));
+        modal.close();
+        
+        // Reseta a posição do modal para próximo uso
+        modal.style.left = '';
+        modal.style.top = '';
+        
+        resolve({ type: selectedPiece, color: color });
+      };
+
+      buttons.forEach(btn => {
+        btn.addEventListener("click", handleClick);
+        // Atualiza o símbolo da peça no botão para a cor correta
+        const piece = { type: btn.dataset.piece, color: color };
+        btn.textContent = pieceToSymbol(piece);
+      });
+    });
+  }
+
 }
 
 export default FunctionsFront;

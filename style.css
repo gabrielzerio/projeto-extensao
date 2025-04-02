@@ -150,7 +150,7 @@ dialog {
   animation: fadeIn 0.3s ease-in-out;
 }
 
-dialog > div {
+.gameState > div {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
@@ -203,6 +203,42 @@ dialog button {
 dialog button:hover {
   background: #daa520; /* Dourado */
   color: #222;
+}
+
+#promotion-modal {
+  position: absolute;
+  padding: 15px;
+  border: 2px solid #b58863;
+  background: #f0d9b5;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  margin: 0;
+}
+
+#promotion-modal::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.promotion-pieces {
+  display: flex;
+  gap: 10px;
+}
+
+.piece-btn {
+  font-size: 2em;
+  width: 50px;
+  height: 50px;
+  padding: 5px;
+  cursor: pointer;
+  background: #f0d9b5;
+  border: 1px solid #b58863;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.piece-btn:hover {
+  background: #b58863;
+  color: #f0d9b5;
 }
 
 /* Animação de entrada suave */
