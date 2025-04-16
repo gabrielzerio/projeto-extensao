@@ -1,6 +1,8 @@
 import FunctionsFront from "./frontUtils.js";
 import PcsMvmt from "./pieceMovement.js";
+import FunctionsTutorial from "./tutorial.js";
 
+const tutorial = new FunctionsTutorial
 const movimentos = new PcsMvmt
 const frontFunctions = new FunctionsFront
 
@@ -385,12 +387,10 @@ function showAlerts(){
 }
 
 initializeBoard();
-createBoard();
 toggleTurn();
 
 window.onload = async () => {
   let teste = await frontFunctions.showPlayersName(player1Name, player2Name);
-  if(teste.equals('peao')){
-    
-  }
+   tutorial.movePieceTo (teste, 4, 4,pieces, selectedPiece,board);  
+  createBoard();
 };

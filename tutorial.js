@@ -1,8 +1,5 @@
-
-movePieceTo('rook', 1, 0); // Move a peça 'pawn' para a posição (1, 0)
-
-function movePieceTo(type, row, col) {
-
+class FunctionsTutorial {
+movePieceTo(type, row, col, pieces, selectedPiece, board) {
     // Esconde todas as outras peças brancas (menos a selecionada)
     for (const piece of pieces) {
         if (piece.color === 'white' && piece !== selectedPiece) {
@@ -28,14 +25,7 @@ function movePieceTo(type, row, col) {
     piece.position.col = col;
   
     board[row][col] = piece;
-  
-    createBoard();
+
+    }
 }
-
-initializeBoard();
-createBoard();
-toggleTurn();
-
-window.onload = () => {
-  frontFunctions.showPlayersName(player1Name, player2Name);
-};
+export default FunctionsTutorial;   
