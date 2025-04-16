@@ -386,11 +386,10 @@ function showAlerts(){
   });
 }
 
-initializeBoard();
 toggleTurn();
 
 window.onload = async () => {
   let teste = await frontFunctions.showPlayersName(player1Name, player2Name);
-   tutorial.movePieceTo (teste, 4, 4,pieces, selectedPiece,board);  
-  createBoard();
+  tutorial.movePieceTo(teste, [{row: 1, col: 6},], [{row: 6, col: 4}], pieces, board);  
+   createBoard();
 };

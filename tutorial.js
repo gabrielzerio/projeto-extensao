@@ -1,31 +1,24 @@
 class FunctionsTutorial {
-movePieceTo(type, row, col, pieces, selectedPiece, board) {
-    // Esconde todas as outras peças brancas (menos a selecionada)
-    for (const piece of pieces) {
-        if (piece.color === 'white' && piece !== selectedPiece) {
-        const { row: oldRow, col: oldCol } = piece.position;
-        if (board[oldRow] && board[oldRow][oldCol] === piece) {
-            board[oldRow][oldCol] = null;
+    movePieceTo(type, blackPositions, whitePositions, pieces, board) {
+        // Coloca as peças brancas do tipo especificado nas posições dadas
+        if (Array.isArray(whitePositions)) {
+            whitePositions.forEach(pos => {
+                const whitePiece = pieces.find(p => p.type === type && p.color === 'white');
+                if (whitePiece) {
+                    board[pos.row][pos.col] = { ...whitePiece }; // Clona a peça
+                }
+            });
         }
-
-        // Coloca fora do tabuleiro
-        piece.position.col = 12;
+        // Coloca peões pretos nas posições dadas
+        if (Array.isArray(blackPositions)) {
+            blackPositions.forEach(pos => {
+                const blackPawn = pieces.find(p => p.type === 'pawn' && p.color === 'black');
+                if (blackPawn) {
+                    board[pos.row][pos.col] = { ...blackPawn }; // Clona a peça
+                }
+            });
         }
-    }
-
-    const piece = pieces.find(p => p.type === type && p.color === 'white');
-    if (!piece) return;
-  
-    const { row: oldRow, col: oldCol } = piece.position;
-    if (board[oldRow] && board[oldRow][oldCol] === piece) {
-      board[oldRow][oldCol] = null;
-    }
-  
-    piece.position.row = row;
-    piece.position.col = col;
-  
-    board[row][col] = piece;
-
+        console.log('Tabuleiro atualizado:', board);
     }
 }
-export default FunctionsTutorial;   
+export default FunctionsTutorial;
