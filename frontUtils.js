@@ -21,11 +21,15 @@ class FunctionsFront {
   showPlayersName(player1Name, player2Name) {
     const modal = document.getElementById("modal1");
     modal.showModal();
-    const btn = document.getElementById("startGame");
-    btn.addEventListener("click", () => {
-      player1Name = document.getElementById("player1").value;
-      player2Name = document.getElementById("player2").value;
-      modal.close();
+  
+    return new Promise((resolve) => {
+      const buttons = document.querySelectorAll("#modal1 button");
+      buttons.forEach((button) => {
+        button.addEventListener("click", (event) => {
+          modal.close();
+          resolve(event.target.dataset.value); // Retorna um valor associado ao botão clicado
+        });
+      });
     });
   }
 

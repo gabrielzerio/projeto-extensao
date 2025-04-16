@@ -388,6 +388,9 @@ initializeBoard();
 createBoard();
 toggleTurn();
 
-window.onload = () => {
-  frontFunctions.showPlayersName(player1Name, player2Name);
+window.onload = async () => {
+  let teste = await frontFunctions.showPlayersName(player1Name, player2Name);
+  if(teste.equals('peao')){
+    
+  }
 };

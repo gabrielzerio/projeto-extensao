@@ -23,42 +23,6 @@ body {
   flex-direction: column;
 }
 
-.right-window{
-  visibility:visible;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-}
-#tutorial-window{
-  display: grid;
-  grid-template-rows: 60px 1fr;
-  border-radius: 10px;
-  background-color: gray;
-  height:80vh ;
-  max-width: 400px;
-}
-#tutorial-window > p{
-  border-radius: 10px;
-  font-size: 20px;
-  padding: 10px;
-  height: max-content;
-  text-align: center;
-  color: white;
-  font-weight: bold;
-  background-color: black;
-
-}
-
-.tutorialw-content{
-  background-color: white;
-  margin: 10px;
-  width: 100%;
-  justify-self:center ;
-  padding: 20px;
-  height: fit-content;
-}
-
 #turn-info{
   background-color: #f0d9b5;
   padding: 20px;
