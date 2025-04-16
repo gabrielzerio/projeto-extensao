@@ -3,25 +3,38 @@ class PcsMvmt {
     // nao utilizado por enquanto
   }
 
-  isValidPawnMove(piece, from, toRow, toCol, board) {
+  isValidPawnMove(piece, from, toRow, toCol, board, enPassantTarget) {
     const direction = piece.color === "white" ? -1 : 1;
     const startRow = piece.color === "white" ? 6 : 1;
 
+    // Movimento normal para frente
     if (from.col === toCol && board[toRow][toCol] === null) {
+      // Movimento simples
       if (toRow === from.row + direction) return true;
 
+      // Movimento duplo da posição inicial
       if (
         from.row === startRow &&
         toRow === from.row + 2 * direction &&
-        board[from.row + direction][toCol] === null &&
-        board[toRow][toCol] === null
+        board[from.row + direction][toCol] === null
       ) {
         return true;
       }
     }
 
+    // Captura diagonal (incluindo en passant)
     if (Math.abs(from.col - toCol) === 1 && toRow === from.row + direction) {
+      // Captura normal
       if (board[toRow][toCol] && board[toRow][toCol].color !== piece.color) {
+        return true;
+      }
+
+      // En passant
+      if (
+        enPassantTarget &&
+        toRow === enPassantTarget.row &&
+        toCol === enPassantTarget.col
+      ) {
         return true;
       }
     }
