@@ -312,42 +312,14 @@ function positionToString(row, col) {
   return `${letters[col]}${8 - row}`;
 }
 
-function isKingInCheck(color) {
-  // Encontra a posição do rei no tabuleiro
-  let kingPosition = null;
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      const piece = board[row][col];
-      if (piece && piece.type === 'king' && piece.color === color) {
-        kingPosition = { row, col };
-        break;
-      }
-    }
-    if (kingPosition) break;
-  }
-
-  if (!kingPosition) return false; // Rei não encontrado (caso extremo)
-
-  // Verifica se alguma peça inimiga pode atacar a posição do rei
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      const piece = board[row][col];
-      if (piece && piece.color !== color) {
-        if (movimentos.isValidMove(piece, { row, col }, kingPosition.row, kingPosition.col, board)) {
-          return true; // O rei está em xeque
-        }
-      }
-    }
-  }
-
-  return false; // O rei não está em xeque
-}
-
 function showAlerts() {
-  const pieceMovement = new PcsMvmt();
-  if (pieceMovement.isKingInCheck(currentColorTurn, board)) {
-    //document.getElementById('move-info').textContent = `${currentColorTurn === "white" ? "Rei branco" : "Rei preto"} está em xeque!`;
-    alert(`${currentColorTurn === "white" ? "Rei branco" : "Rei preto"} está em xeque!`)
+  if (movimentos.isKingInCheck(currentColorTurn, board)) {
+    if (movimentos.isCheckmate(currentColorTurn, board, pieces)) {
+      // Opcional: Desabilitar o tabuleiro após o xeque-mate
+      frontFunctions.showEndGame();
+    } else {
+      alert(`${currentColorTurn === "white" ? "Rei branco" : "Rei preto"} está em xeque!`);
+    }
   }
 }
 
