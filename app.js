@@ -166,7 +166,7 @@ async function movePiece(piece, from, toRow, toCol) {
     piece.hasMoved = true;
 
     // Verifica se o rei está em xeque após o movimento
-    const kingInCheck = isKingInCheck(piece.color);
+    const kingInCheck = movimentos.isKingInCheck(piece.color, board);
 
     // Reverte o movimento se deixar o rei em xeque
     if (kingInCheck) {
@@ -259,7 +259,7 @@ function showPossibleMoves(piece, row, col) {
         piece.position = { row: r, col: c };
         
         // Verifica se o rei está em xeque após o movimento
-        const kingInCheck = isKingInCheck(piece.color);
+        const kingInCheck = movimentos.isKingInCheck(piece.color, board);
          console.log(board.map(row => row.map(p => p ? p.type : null)))
         // Reverte o movimento temporário
         board[row][col] = piece;
