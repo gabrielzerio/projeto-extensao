@@ -327,6 +327,17 @@ initializeBoard();
 createBoard();
 toggleTurn();
 
-window.onload = () => {
-  frontFunctions.showPlayersName(player1Name, player2Name);
+window.onload = async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode');
+  let opcao;
+    if(mode==='default'){
+      frontFunctions.showPlayersName(player1Name, player2Name);
+    }
+    else if(mode === 'tutorial'){
+    
+       opcao = await frontFunctions.showTutorial();
+    }
+    console.log(opcao)
+    
 };
