@@ -1,0 +1,16 @@
+{
+  "name": "chess-game",
+  "version": "1.0.0",
+  "description": "A chess game implementation",
+  "main": "dist/app.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "start": "npm run build & serve"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "serve": "^14.0.0"
+  }
+}
