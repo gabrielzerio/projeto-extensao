@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jogo de Xadrez</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="main-grid">
+    <div class="dead-pieces">
+      <div id="black-pieces"></div>
+      <div id="white-pieces"></div>
+    </div>
+    <div class="chess-container">
+      <div id="turn-info"></div>
+      <div>
+        <div id="board-wrapper" class="board-wrapper">
+          <div id="board" class="chess-board"></div>
+
+          <div class="y-coordinates">
+            <div>8</div>
+            <div>7</div>
+            <div>6</div>
+            <div>5</div>
+            <div>4</div>
+            <div>3</div>
+            <div>2</div>
+            <div>1</div>
+          </div>
+        </div>
+
+        <div class="x-coordinates">
+          <div>A</div>
+          <div>B</div>
+          <div>C</div>
+          <div>D</div>
+          <div>E</div>
+          <div>F</div>
+          <div>G</div>
+          <div>H</div>
+        </div>
+        <div class="info-panel">
+          <p id="move-info">Clique em uma peça para mover</p>
+          <p id="hint"></p>
+        </div>
+      </div>
+    </div> <!-- Fechando corretamente a div "chess-container" -->
+  </div> <!-- Fechando corretamente a div "main-grid" -->
+  <dialog id="promotion-modal" class="modal">
+    <h2>Escolha uma peça para promoção</h2>
+    <div class="promotion-pieces">
+      <button class="piece-btn" data-piece="queen">♕</button>
+      <button class="piece-btn" data-piece="rook">♖</button>
+      <button class="piece-btn" data-piece="bishop">♗</button>
+      <button class="piece-btn" data-piece="knight">♘</button>
+    </div>
+  </dialog>
+  <dialog class="gameState" id="modal2">
+    <div>
+    <h2>Fim de Jogo!</h2>
+    <p id="winnerMessage"></p>
+    <button id="restartGame">Jogar Novamente</button>
+  </div>
+  </dialog>
+
+  <dialog class="gameState" id="modal1">
+    <div id="divModal">
+    
+  </div>
+  </dialog>
+
+  <script type="module" src="app.js"></script>
+</body>
+
+</html>

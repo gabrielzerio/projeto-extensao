@@ -2,10 +2,9 @@ import FunctionsFront from "./frontUtils.js";
 import PcsMvmt from "./pieceMovement.js";
 import FunctionsTutorial from "./tutorial.js";
 
-const tutorial = new FunctionsTutorial
 const movimentos = new PcsMvmt
 const frontFunctions = new FunctionsFront
-
+const tutorialFunctions = new FunctionsTutorial
 
 const board = Array(8).fill(null).map(() => Array(8).fill(null));
 
@@ -168,7 +167,7 @@ async function movePiece(piece, from, toRow, toCol) {
     piece.hasMoved = true;
 
     // Verifica se o rei está em xeque após o movimento
-    const kingInCheck = isKingInCheck(piece.color);
+    const kingInCheck = movimentos.isKingInCheck(piece.color, board);
 
     // Reverte o movimento se deixar o rei em xeque
     if (kingInCheck) {
@@ -261,7 +260,7 @@ function showPossibleMoves(piece, row, col) {
         piece.position = { row: r, col: c };
         
         // Verifica se o rei está em xeque após o movimento
-        const kingInCheck = isKingInCheck(piece.color);
+        const kingInCheck = movimentos.isKingInCheck(piece.color, board);
          console.log(board.map(row => row.map(p => p ? p.type : null)))
         // Reverte o movimento temporário
         board[row][col] = piece;
@@ -325,10 +324,28 @@ function showAlerts() {
   }
 }
 
+
 toggleTurn();
 
 window.onload = async () => {
-  let teste = await frontFunctions.showPlayersName(player1Name, player2Name);
-  tutorial.movePieceTo(teste, [{row: 1, col: 6},], [{row: 6, col: 4}], pieces, board);  
-   createBoard();
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode');
+  let opcao;
+    if(mode==='default'){
+      frontFunctions.showPlayersName(player1Name, player2Name);
+      initializeBoard();
+      createBoard();
+    }
+    else if(mode === 'tutorial'){
+       opcao = await frontFunctions.showTutorial(); 
+       if(opcao === 'knight'){
+          const whitePawnPositions = Array.from({ length: 8 }, (_, col) => ({ row: 6, col}));
+          tutorialFunctions.tutorialKnight(opcao, [{row: 1, col: 6},], [{row: 7, col: 1},], whitePawnPositions, pieces, board);
+       }
+       if(opcao === 'pawn'){
+          tutorialFunctions.movePieceTo(opcao, [{row: 1, col: 6},], [{row: 6, col: 4},], pieces, board);           
+       }
+ 
+       createBoard();
+    }
 };
