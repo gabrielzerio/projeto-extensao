@@ -1,5 +1,5 @@
 // Importações
-import FunctionsFront from "./frontUtil.js";
+import FunctionsFront from "./frontUtils.js";
 import PcsMvmt from "./pieceMovement.js";
 const movimentos = new PcsMvmt();
 const frontFunctions = new FunctionsFront();
