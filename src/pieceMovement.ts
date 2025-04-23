@@ -1,18 +1,17 @@
+import { Piece, Position, Board, PieceType } from './app';
+
 class PcsMvmt {
   constructor() {
-    // nao utilizado por enquanto
+    // não utilizado por enquanto
   }
 
-  isValidPawnMove(piece, from, toRow, toCol, board, enPassantTarget) {
+  isValidPawnMove(piece: Piece, from: Position, toRow: number, toCol: number, board: Board, enPassantTarget?: Position | null): boolean {
     const direction = piece.color === "white" ? -1 : 1;
     const startRow = piece.color === "white" ? 6 : 1;
 
-    // Movimento normal para frente
     if (from.col === toCol && board[toRow][toCol] === null) {
-      // Movimento simples
       if (toRow === from.row + direction) return true;
 
-      // Movimento duplo da posição inicial
       if (
         from.row === startRow &&
         toRow === from.row + 2 * direction &&
@@ -22,14 +21,11 @@ class PcsMvmt {
       }
     }
 
-    // Captura diagonal (incluindo en passant)
     if (Math.abs(from.col - toCol) === 1 && toRow === from.row + direction) {
-      // Captura normal
-      if (board[toRow][toCol] && board[toRow][toCol].color !== piece.color) {
+      if (board[toRow][toCol] && board[toRow][toCol]!.color !== piece.color) {
         return true;
       }
 
-      // En passant
       if (
         enPassantTarget &&
         toRow === enPassantTarget.row &&
@@ -42,64 +38,58 @@ class PcsMvmt {
     return false;
   }
 
-  isValidRookMove(from, toRow, toCol, board) {
+  isValidRookMove(from: Position, toRow: number, toCol: number, board: Board): boolean {
     const rowDiff = Math.abs(from.row - toRow);
     const colDiff = Math.abs(from.col - toCol);
     return (rowDiff === 0 || colDiff === 0) && !this.isPathBlocked(from, toRow, toCol, board);
   }
 
-  isValidBishopMove(from, toRow, toCol, board) {
+  isValidBishopMove(from: Position, toRow: number, toCol: number, board: Board): boolean {
     const rowDiff = Math.abs(from.row - toRow);
     const colDiff = Math.abs(from.col - toCol);
     return rowDiff === colDiff && !this.isPathBlocked(from, toRow, toCol, board);
   }
 
-  isValidQueenMove(from, toRow, toCol, board) {
-    return this.isValidRookMove(from, toRow, toCol, board) || this.isValidBishopMove(from, toRow, toCol, board);
+  isValidQueenMove(from: Position, toRow: number, toCol: number, board: Board): boolean {
+    return this.isValidRookMove(from, toRow, toCol, board) || 
+           this.isValidBishopMove(from, toRow, toCol, board);
   }
 
-  isValidKnightMove(from, toRow, toCol, board) {
+  isValidKnightMove(from: Position, toRow: number, toCol: number, board: Board): boolean {
     const rowDiff = Math.abs(from.row - toRow);
     const colDiff = Math.abs(from.col - toCol);
     
     if ((rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)) {
-      // Verifica se a casa de destino não está ocupada por uma peça da mesma cor
-      if (board[toRow][toCol] === null || board[toRow][toCol].color !== board[from.row][from.col].color) {
+      const sourcePiece = board[from.row][from.col];
+      if (!sourcePiece) return false;
+      
+      if (board[toRow][toCol] === null || board[toRow][toCol]?.color !== sourcePiece.color) {
         return true;
       }
     }
-  
     return false;
   }
-  
 
-  isValidKingMove(piece, from, toRow, toCol, board) {
+  isValidKingMove(piece: Piece, from: Position, toRow: number, toCol: number, board: Board): boolean {
     const rowDiff = Math.abs(from.row - toRow);
     const colDiff = Math.abs(from.col - toCol);
 
-    // Movimento normal do rei
     if (rowDiff <= 1 && colDiff <= 1) {
       return true;
     }
 
-    // Verifica se é um movimento de roque
     if (rowDiff === 0 && Math.abs(colDiff) === 2) {
-      // Verifica se é a posição inicial do rei
       if (from.row !== (piece.color === 'white' ? 7 : 0)) return false;
       if (from.col !== 4) return false;
       
-      // Verifica se o rei já se moveu
       if (piece.hasMoved) return false;
 
-      // Roque curto (direita)
       if (toCol === from.col + 2) {
         const rook = board[from.row][7];
         if (!rook || rook.type !== 'rook' || rook.hasMoved) return false;
         
-        // Verifica se o caminho está livre
         if (board[from.row][5] || board[from.row][6]) return false;
         
-        // Verifica se as casas que o rei atravessa estão sob ataque
         if (this.isSquareUnderAttack(from.row, 5, piece.color, board) ||
             this.isSquareUnderAttack(from.row, 6, piece.color, board)) {
           return false;
@@ -108,15 +98,12 @@ class PcsMvmt {
         return true;
       }
 
-      // Roque longo (esquerda)
       if (toCol === from.col - 2) {
         const rook = board[from.row][0];
         if (!rook || rook.type !== 'rook' || rook.hasMoved) return false;
         
-        // Verifica se o caminho está livre
         if (board[from.row][1] || board[from.row][2] || board[from.row][3]) return false;
         
-        // Verifica se as casas que o rei atravessa estão sob ataque
         if (this.isSquareUnderAttack(from.row, 2, piece.color, board) ||
             this.isSquareUnderAttack(from.row, 3, piece.color, board)) {
           return false;
@@ -129,20 +116,19 @@ class PcsMvmt {
     return false;
   }
 
-  isSquareUnderAttack(row, col, kingColor, board) {
+  isSquareUnderAttack(row: number, col: number, kingColor: string, board: Board): boolean {
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
         const piece = board[r][c];
         if (piece && piece.color !== kingColor) {
-          // Use uma verificação simplificada para evitar recursão infinita
           switch (piece.type) {
-            case 'pawn':
-              // Verifica diagonal de captura do peão
+            case 'pawn': {
               const direction = piece.color === "white" ? -1 : 1;
               if (r + direction === row && (c + 1 === col || c - 1 === col)) {
                 return true;
               }
               break;
+            }
             case 'rook':
               if (this.isValidRookMove({row: r, col: c}, row, col, board)) {
                 return true;
@@ -163,14 +149,14 @@ class PcsMvmt {
                 return true;
               }
               break;
-            case 'king':
-              // Para o rei, verifica apenas movimento normal (sem roque)
+            case 'king': {
               const rowDiff = Math.abs(r - row);
               const colDiff = Math.abs(c - col);
               if (rowDiff <= 1 && colDiff <= 1) {
                 return true;
               }
               break;
+            }
           }
         }
       }
@@ -178,7 +164,7 @@ class PcsMvmt {
     return false;
   }
 
-  isPathBlocked(from, toRow, toCol, board) {
+  isPathBlocked(from: Position, toRow: number, toCol: number, board: Board): boolean {
     const rowStep = Math.sign(toRow - from.row);
     const colStep = Math.sign(toCol - from.col);
 
@@ -195,8 +181,7 @@ class PcsMvmt {
     return false;
   }
 
-  isValidMove(piece, from, toRow, toCol, board) {
-    // Verifica se a casa de destino não tem uma peça da mesma cor
+  isValidMove(piece: Piece, from: Position, toRow: number, toCol: number, board: Board): boolean {
     const targetPiece = board[toRow][toCol];
     if (targetPiece && targetPiece.color === piece.color) return false;
 
@@ -222,9 +207,7 @@ class PcsMvmt {
         break;
     }
 
-    // Se o movimento é válido, verifica se deixaria o rei em xeque
     if (isValid) {
-      // Simula o movimento
       const originalPiece = board[toRow][toCol];
       const originalPosition = { ...piece.position };
       
@@ -232,10 +215,8 @@ class PcsMvmt {
       board[toRow][toCol] = piece;
       piece.position = { row: toRow, col: toCol };
 
-      // Verifica se o rei ficaria em xeque
       const inCheck = this.isKingInCheck(piece.color, board);
 
-      // Desfaz o movimento
       board[from.row][from.col] = piece;
       board[toRow][toCol] = originalPiece;
       piece.position = originalPosition;
@@ -246,9 +227,9 @@ class PcsMvmt {
     return false;
   }
 
-  isKingInCheck(color, board) {
-    // Encontra a posição do rei
-    let kingRow, kingCol;
+  isKingInCheck(color: string, board: Board): boolean {
+    let kingRow: number | undefined, kingCol: number | undefined;
+    
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
         const piece = board[r][c];
@@ -261,17 +242,15 @@ class PcsMvmt {
       if (kingRow !== undefined) break;
     }
 
-    // Verifica se o rei está sob ataque
+    if (kingRow === undefined || kingCol === undefined) return false;
     return this.isSquareUnderAttack(kingRow, kingCol, color, board);
   }
 
-  isCheckmate(color, board, pieces) {
-    // Primeiro verifica se o rei está em xeque
+  isCheckmate(color: string, board: Board, pieces: Piece[]): boolean {
     if (!this.isKingInCheck(color, board)) {
       return false;
     }
 
-    // Para cada peça do jogador em xeque, verifica se há algum movimento válido
     for (const piece of pieces.filter(p => p.color === color)) {
       const { row, col } = piece.position;
 
@@ -281,29 +260,26 @@ class PcsMvmt {
             const originalPiece = board[r][c];
             const originalPosition = { ...piece.position };
 
-            // Simula o movimento
             board[row][col] = null;
             board[r][c] = piece;
             piece.position = { row: r, col: c };
 
             const stillInCheck = this.isKingInCheck(color, board);
 
-            // Reverte a jogada simulada
             board[row][col] = piece;
             board[r][c] = originalPiece;
             piece.position = originalPosition;
 
             if (!stillInCheck) {
-              return false; // Existe pelo menos um movimento que tira o rei do xeque
+              return false;
             }
           }
         }
       }
     }
 
-    return true; // Nenhuma peça pode sair do xeque -> xeque-mate
+    return true;
   }
 }
 
-// Exportando a classe
 export default PcsMvmt;

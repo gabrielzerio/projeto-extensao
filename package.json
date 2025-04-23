@@ -1,0 +1,17 @@
+{
+  "name": "chess-game",
+  "version": "1.0.0",
+  "description": "A chess game implementation",
+  "main": "dist/app.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "start": "npx tsc && npx live-server --port=3000 --watch=."
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "serve": "^14.2.4",
+    "typescript": "^5.0.0"
+  }
+}

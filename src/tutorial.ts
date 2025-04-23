@@ -1,5 +1,7 @@
+import { Piece, Position, Board } from './app';
+
 class FunctionsTutorial {
-    movePieceTo(type, blackPositions, whitePositions, pieces, board) {
+    movePieceTo(type: string, blackPositions: Position[], whitePositions: Position[], pieces: Piece[], board: Board): void {
         // Coloca as peças brancas do tipo especificado nas posições dadas
         if (Array.isArray(whitePositions)) {
             whitePositions.forEach(pos => {
@@ -20,8 +22,8 @@ class FunctionsTutorial {
         }
     }
 
-    tutorialKnight(type, blackPositions, whitePositions, whitePawns, pieces, board){
-        if(Array.isArray(whitePositions)){
+    tutorialKnight(type: string, blackPositions: Position[], whitePositions: Position[], whitePawns: Position[], pieces: Piece[], board: Board): void {
+        if (Array.isArray(whitePositions)) {
             whitePositions.forEach(pos => {
                 const whiteKnight = pieces.find(p => p.type === type && p.color === 'white');
                 if (whiteKnight) {
@@ -51,4 +53,5 @@ class FunctionsTutorial {
         }
     }
 }
+
 export default FunctionsTutorial;
