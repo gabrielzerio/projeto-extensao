@@ -7,10 +7,10 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "start": "npm run build & serve"
+    "start": "npx tsc && npx serve ."
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "serve": "^14.0.0"
+    "serve": "^14.2.4",
+    "typescript": "^5.0.0"
   }
 }

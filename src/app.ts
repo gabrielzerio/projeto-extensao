@@ -353,6 +353,8 @@ toggleTurn();
 window.onload = async () => {
     console.log("Full URL:", window.location.href);
     const urlParams = new URLSearchParams(window.location.search);
+
+
     console.log("URL Search Params:", window.location.search);
     const mode = urlParams.get('mode');
     console.log("Mode parameter:", mode);

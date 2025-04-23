@@ -292,16 +292,21 @@ initializeBoard();
 createBoard();
 toggleTurn();
 // Event listeners
-document.addEventListener('DOMContentLoaded', async () => {
+window.onload = async () => {
+    console.log("Full URL:", window.location.href);
     const urlParams = new URLSearchParams(window.location.search);
+    console.log("URL Search Params:", window.location.search);
     const mode = urlParams.get('mode');
-    console.log("Mode:", mode);
+    console.log("Mode parameter:", mode);
     if (mode === 'default') {
-        await frontFunctions.showPlayersName(player1Name, player2Name);
+        frontFunctions.showPlayersName(player1Name, player2Name);
     }
     else if (mode === 'tutorial') {
         const opcao = await frontFunctions.showTutorial();
         console.log(opcao);
     }
-});
+    else {
+        console.log("No valid mode parameter found");
+    }
+};
 //# sourceMappingURL=app.js.map
