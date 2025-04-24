@@ -5,13 +5,14 @@
   "main": "dist/app.js",
   "type": "module",
   "scripts": {
-    "build": "tsc",
     "watch": "tsc -w",
-    "start": "npm run build && npx live-server public --port=3000 --watch=public,dist --mount=/dist:dist"
+    "start": "npm run build && npx live-server public --port=3000 --watch=public,dist --mount=/dist:dist",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "devDependencies": {
-    "live-server": "^1.2.2",
-    "serve": "^14.2.4",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vite": "^6.3.3"
   }
 }
