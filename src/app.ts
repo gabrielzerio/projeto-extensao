@@ -21,8 +21,8 @@ interface EnPassantTarget {
 }
 
 // Importações
-import FunctionsFront from "./frontUtils.js";
-import PcsMvmt from "./pieceMovement.js";
+import FunctionsFront from "./utils/frontUtils.js";
+import PcsMvmt from "./utils/pieceMovement.js";
 import FunctionsTutorial from "./tutorial.js";
 
 const movimentos = new PcsMvmt();
@@ -352,7 +352,6 @@ window.onload = async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const mode = urlParams.get('mode');
   let opcao;
-  console.log('eaeaeae', mode);
     if(mode==='default'){
       frontFunctions.showPlayersName(player1Name, player2Name);
       initializeBoard();

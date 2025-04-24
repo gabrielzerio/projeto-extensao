@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "start": "npx tsc && npx live-server --port=3000 --watch=."
+    "start": "npm run build && npx live-server public --port=3000 --watch=public,dist --mount=/dist:dist"
   },
   "devDependencies": {
     "live-server": "^1.2.2",
