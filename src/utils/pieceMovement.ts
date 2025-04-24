@@ -1,4 +1,4 @@
-import { Piece, Position, Board, PieceType } from '../app';
+import { Piece, Position, Board, PieceType } from '../models/types';
 
 class PcsMvmt {
   constructor() {

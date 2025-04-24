@@ -1,4 +1,4 @@
-import { Piece, Position, Board } from './app';
+import { Piece, Position, Board } from './models/types';
 
 class FunctionsTutorial {
     movePieceTo(type: string, blackPositions: Position[], whitePositions: Position[], pieces: Piece[], board: Board): void {

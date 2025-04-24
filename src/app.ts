@@ -1,24 +1,4 @@
-// Tipos e interfaces básicas
-type PieceType = "pawn" | "rook" | "knight" | "bishop" | "queen" | "king";
-type PieceColor = "white" | "black";
-type Board = (Piece | null)[][];
-
-interface Position {
-  row: number;
-  col: number;
-}
-
-interface Piece {
-  type: PieceType;
-  color: PieceColor;
-  position: Position;
-  hasMoved?: boolean;
-}
-
-interface EnPassantTarget {
-  row: number;
-  col: number;
-}
+import { Piece, PieceType, PieceColor, Position, Board, EnPassantTarget } from "./models/types";
 
 // Importações
 import FunctionsFront from "./utils/frontUtils.js";
@@ -369,13 +349,4 @@ window.onload = async () => {
  
        createBoard();
     }
-};
-
-export {
-  PieceType,
-  PieceColor,
-  Position,
-  Piece,
-  Board,
-  EnPassantTarget
 };
