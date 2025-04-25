@@ -2,7 +2,7 @@
   "name": "chess-game",
   "version": "1.0.0",
   "description": "A chess game implementation",
-  "main": "dist/app.js",
+  "main": "src/app.ts",
   "type": "module",
   "scripts": {
     "watch": "tsc -w",
