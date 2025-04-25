@@ -7,6 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   root: '.', // raiz do projeto (ajuste se necessário)
+
   build: {
     rollupOptions: {
       input: {
