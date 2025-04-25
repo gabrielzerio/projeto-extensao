@@ -124,7 +124,7 @@ async function pawnPromotion(piece: Piece, toRow: number, toCol: number): Promis
 }
 
 async function movePiece(piece: Piece, from: Position, toRow: number, toCol: number): Promise<boolean> {
-  if (movimentos.isValidMove(piece, from, toRow, toCol, board)) {
+  if (movimentos.isValidMove(piece, from, toRow, toCol, board, enPassantTarget)) {
     await pawnPromotion(piece, toRow, toCol);
     const originalPiece = board[toRow][toCol];
     const originalPosition = { ...piece.position };
@@ -238,7 +238,7 @@ function showPossibleMoves(piece: Piece, row: number, col: number): void {
 
     if (rookQueenSide && !rookQueenSide.hasMoved && 
         !board[row][1] && !board[row][2] && !board[row][3] && 
-        movimentos.isValidMove(piece, {row, col}, row, col - 2, board)) {
+        movimentos.isValidMove(piece, {row, col}, row, col - 2, board, enPassantTarget)) {
       const square = document.getElementById(`${row}-${col - 2}`);
       if (square) square.classList.add('highlight');
     }
@@ -246,7 +246,7 @@ function showPossibleMoves(piece: Piece, row: number, col: number): void {
 
   for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
-      if (movimentos.isValidMove(piece, { row, col }, r, c, board)) {
+      if (movimentos.isValidMove(piece, { row, col }, r, c, board, enPassantTarget)) {
         const originalPiece = board[r][c];
         const originalPosition = { ...piece.position };
 

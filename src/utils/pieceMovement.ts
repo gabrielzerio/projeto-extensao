@@ -4,6 +4,51 @@ class PcsMvmt {
   constructor() {
     // não utilizado por enquanto
   }
+  isValidMove(piece: Piece, from: Position, toRow: number, toCol: number, board: Board, enPassantTarget?: Position | null): boolean {
+    const targetPiece = board[toRow][toCol];
+    if (targetPiece && targetPiece.color === piece.color) return false;
+
+    let isValid = false;
+    switch (piece.type) {
+      case 'pawn':
+        isValid = this.isValidPawnMove(piece, from, toRow, toCol, board, enPassantTarget);
+        break;
+      case 'rook':
+        isValid = this.isValidRookMove(from, toRow, toCol, board);
+        break;
+      case 'knight':
+        isValid = this.isValidKnightMove(from, toRow, toCol, board);
+        break;
+      case 'bishop':
+        isValid = this.isValidBishopMove(from, toRow, toCol, board);
+        break;
+      case 'queen':
+        isValid = this.isValidQueenMove(from, toRow, toCol, board);
+        break;
+      case 'king':
+        isValid = this.isValidKingMove(piece, from, toRow, toCol, board);
+        break;
+    }
+
+    if (isValid) {
+      const originalPiece = board[toRow][toCol];
+      const originalPosition = { ...piece.position };
+      
+      board[from.row][from.col] = null;
+      board[toRow][toCol] = piece;
+      piece.position = { row: toRow, col: toCol };
+
+      const inCheck = this.isKingInCheck(piece.color, board);
+
+      board[from.row][from.col] = piece;
+      board[toRow][toCol] = originalPiece;
+      piece.position = originalPosition;
+
+      return !inCheck;
+    }
+
+    return false;
+  }
 
   isValidPawnMove(piece: Piece, from: Position, toRow: number, toCol: number, board: Board, enPassantTarget?: Position | null): boolean {
     const direction = piece.color === "white" ? -1 : 1;
@@ -178,52 +223,6 @@ class PcsMvmt {
       row += rowStep;
       col += colStep;
     }
-    return false;
-  }
-
-  isValidMove(piece: Piece, from: Position, toRow: number, toCol: number, board: Board): boolean {
-    const targetPiece = board[toRow][toCol];
-    if (targetPiece && targetPiece.color === piece.color) return false;
-
-    let isValid = false;
-    switch (piece.type) {
-      case 'pawn':
-        isValid = this.isValidPawnMove(piece, from, toRow, toCol, board);
-        break;
-      case 'rook':
-        isValid = this.isValidRookMove(from, toRow, toCol, board);
-        break;
-      case 'knight':
-        isValid = this.isValidKnightMove(from, toRow, toCol, board);
-        break;
-      case 'bishop':
-        isValid = this.isValidBishopMove(from, toRow, toCol, board);
-        break;
-      case 'queen':
-        isValid = this.isValidQueenMove(from, toRow, toCol, board);
-        break;
-      case 'king':
-        isValid = this.isValidKingMove(piece, from, toRow, toCol, board);
-        break;
-    }
-
-    if (isValid) {
-      const originalPiece = board[toRow][toCol];
-      const originalPosition = { ...piece.position };
-      
-      board[from.row][from.col] = null;
-      board[toRow][toCol] = piece;
-      piece.position = { row: toRow, col: toCol };
-
-      const inCheck = this.isKingInCheck(piece.color, board);
-
-      board[from.row][from.col] = piece;
-      board[toRow][toCol] = originalPiece;
-      piece.position = originalPosition;
-
-      return !inCheck;
-    }
-
     return false;
   }
 
