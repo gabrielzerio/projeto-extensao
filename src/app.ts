@@ -87,8 +87,9 @@ function pieceToSymbol(piece: Piece): string {
 
 async function handleSquareClick(row: number, col: number): Promise<void> {
   const piece = board[row][col];
+  const to: Position = { row, col };
   if (selectedPiece) {
-    if (selectedPosition && await movePiece(selectedPiece, selectedPosition, row, col)) {
+    if (selectedPosition && await movePiece(selectedPiece, selectedPosition, to)) {
       toggleTurn();
       selectedPiece = null;
       selectedPosition = null;
@@ -111,11 +112,11 @@ async function handleSquareClick(row: number, col: number): Promise<void> {
   }
 }
 
-async function pawnPromotion(piece: Piece, toRow: number, toCol: number): Promise<void> {
-  if (piece.type === "pawn" && (toRow === 0 || toRow === 7)) {
-    const promotedPiece = await frontFunctions.showPromotionDialog(piece.color, toRow, toCol, pieceToSymbol);
+async function pawnPromotion(piece: Piece, position: Position): Promise<void> {
+  if (piece.type === "pawn" && (position.row === 0 || position.row === 7)) {
+    const promotedPiece = await frontFunctions.showPromotionDialog(piece.color, position, pieceToSymbol);
     piece.type = promotedPiece.type as PieceType;
-    const square = document.getElementById(`${toRow}-${toCol}`);
+    const square = document.getElementById(`${position.row}-${position.col}`);
     const pieceElement = square?.querySelector(".piece");
     if (pieceElement) {
       pieceElement.textContent = pieceToSymbol(piece);
@@ -123,35 +124,35 @@ async function pawnPromotion(piece: Piece, toRow: number, toCol: number): Promis
   }
 }
 
-async function movePiece(piece: Piece, from: Position, toRow: number, toCol: number): Promise<boolean> {
-  if (movimentos.isValidMove(piece, from, toRow, toCol, board, enPassantTarget)) {
-    await pawnPromotion(piece, toRow, toCol);
-    const originalPiece = board[toRow][toCol];
+async function movePiece(piece: Piece, from: Position, to: Position): Promise<boolean> {
+  if (movimentos.isValidMove(piece, from, to, board, enPassantTarget)) {
+    await pawnPromotion(piece, to);
+    const originalPiece = board[to.row][to.col];
     const originalPosition = { ...piece.position };
     
     const isEnPassantMove = piece.type === "pawn" && enPassantTarget && 
-                           toRow === enPassantTarget.row && toCol === enPassantTarget.col;
+                           to.row === enPassantTarget.row && to.col === enPassantTarget.col;
     
     let capturedPawn: Piece | null = null;
     if (isEnPassantMove) {
-      const capturedPawnRow = piece.color === "white" ? toRow + 1 : toRow - 1;
-      capturedPawn = board[capturedPawnRow][toCol];
+      const capturedPawnRow = piece.color === "white" ? to.row + 1 : to.row - 1;
+      capturedPawn = board[capturedPawnRow][to.col];
     }
 
     board[from.row][from.col] = null;
-    board[toRow][toCol] = piece;
-    piece.position = { row: toRow, col: toCol };
+    board[to.row][to.col] = piece;
+    piece.position = { row: to.row, col: to.col };
 
     if (isEnPassantMove && capturedPawn) {
-      const capturedPawnRow = piece.color === "white" ? toRow + 1 : toRow - 1;
-      board[capturedPawnRow][toCol] = null;
+      const capturedPawnRow = piece.color === "white" ? to.row + 1 : to.row - 1;
+      board[capturedPawnRow][to.col] = null;
       removePiece(capturedPawn);
       const index = pieces.indexOf(capturedPawn);
       if (index > -1) pieces.splice(index, 1);
     }
 
-    if (piece.type === 'king' && Math.abs(from.col - toCol) === 2) {
-      const isKingSide = toCol > from.col;
+    if (piece.type === 'king' && Math.abs(from.col - to.col) === 2) {
+      const isKingSide = to.col > from.col;
       const rookCol = isKingSide ? 7 : 0;
       const newRookCol = isKingSide ? 5 : 3;
       
@@ -168,12 +169,12 @@ async function movePiece(piece: Piece, from: Position, toRow: number, toCol: num
 
     if (movimentos.isKingInCheck(piece.color, board)) {
       board[from.row][from.col] = piece;
-      board[toRow][toCol] = originalPiece;
+      board[to.row][to.col] = originalPiece;
       piece.position = originalPosition;
       
       if (isEnPassantMove && capturedPawn) {
-        const capturedPawnRow = piece.color === "white" ? toRow + 1 : toRow - 1;
-        board[capturedPawnRow][toCol] = capturedPawn;
+        const capturedPawnRow = piece.color === "white" ? to.row + 1 : to.row - 1;
+        board[capturedPawnRow][to.col] = capturedPawn;
       }
       
       const moveInfo = document.getElementById('move-info');
@@ -181,8 +182,8 @@ async function movePiece(piece: Piece, from: Position, toRow: number, toCol: num
       return false;
     }
 
-    if (piece.type === "pawn" && Math.abs(from.row - toRow) === 2) {
-      enPassantTarget = { row: (from.row + toRow) / 2, col: toCol };
+    if (piece.type === "pawn" && Math.abs(from.row - to.row) === 2) {
+      enPassantTarget = { row: (from.row + to.row) / 2, col: to.col };
     } else {
       enPassantTarget = null;
     }
@@ -193,7 +194,7 @@ async function movePiece(piece: Piece, from: Position, toRow: number, toCol: num
       if (index > -1) pieces.splice(index, 1);
     }
     
-    movePieceAnimation(toRow, toCol, from);
+    movePieceAnimation(to, from);
     return true;
   }
 
@@ -202,24 +203,24 @@ async function movePiece(piece: Piece, from: Position, toRow: number, toCol: num
   return false;
 }
 
-function movePieceAnimation(toRow: number, toCol: number, from: Position): void {
+function movePieceAnimation(to: Position, from: Position): void {
   const pieceElement = document.getElementById(`${from.row}-${from.col}`)?.querySelector(".piece") as HTMLElement;
   if (!pieceElement) return;
 
   const squareSize = 80;
-  const deltaX = (toCol - from.col) * squareSize;
-  const deltaY = (toRow - from.row) * squareSize;
+  const deltaX = (to.col - from.col) * squareSize;
+  const deltaY = (to.row - from.row) * squareSize;
 
   pieceElement.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
 
   setTimeout(() => {
     pieceElement.style.transform = "";
-    pieceElement.parentElement!.id = `${toRow}-${toCol}`;
+    pieceElement.parentElement!.id = `${to.row}-${to.col}`;
     createBoard();
   }, 300);
 
   const moveInfo = document.getElementById('move-info');
-  if (moveInfo) moveInfo.textContent = `Peça movida para ${positionToString(toRow, toCol).toUpperCase()}`;
+  if (moveInfo) moveInfo.textContent = `Peça movida para ${positionToString(to.row, to.col).toUpperCase()}`;
 }
 
 function showPossibleMoves(piece: Piece, row: number, col: number): void {
@@ -228,17 +229,17 @@ function showPossibleMoves(piece: Piece, row: number, col: number): void {
   if (piece.type === 'king' && !piece.hasMoved) {
     const rookKingSide = board[row][7];
     const rookQueenSide = board[row][0];
+    const position = { row, col };
 
     if (rookKingSide && !rookKingSide.hasMoved && 
-        !board[row][5] && !board[row][6] && 
-        movimentos.isValidKingMove(piece, {row, col}, row, col + 2, board)) {
+        !board[row][5] && !board[row][6] && movimentos.isValidKingMove(piece, position, { row, col: col + 2 }, board)) {
       const square = document.getElementById(`${row}-${col + 2}`);
       if (square) square.classList.add('highlight');
     }
 
     if (rookQueenSide && !rookQueenSide.hasMoved && 
         !board[row][1] && !board[row][2] && !board[row][3] && 
-        movimentos.isValidMove(piece, {row, col}, row, col - 2, board, enPassantTarget)) {
+        movimentos.isValidMove(piece, position, {row, col:col - 2}, board, enPassantTarget)) {
       const square = document.getElementById(`${row}-${col - 2}`);
       if (square) square.classList.add('highlight');
     }
@@ -246,13 +247,14 @@ function showPossibleMoves(piece: Piece, row: number, col: number): void {
 
   for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
-      if (movimentos.isValidMove(piece, { row, col }, r, c, board, enPassantTarget)) {
+      const to: Position = { row: r, col: c };
+      if (movimentos.isValidMove(piece, { row, col }, to, board, enPassantTarget)) {
         const originalPiece = board[r][c];
         const originalPosition = { ...piece.position };
 
         board[row][col] = null;
         board[r][c] = piece;
-        piece.position = { row: r, col: c };
+        piece.position = to;
         
         const kingInCheck = movimentos.isKingInCheck(piece.color, board);
 
@@ -263,8 +265,9 @@ function showPossibleMoves(piece: Piece, row: number, col: number): void {
         if (!kingInCheck) {
           const square = document.getElementById(`${r}-${c}`);
           if (square) {
+            const to:Position = { row: r, col: c };
             square.classList.add(
-              frontFunctions.canCaptureEnemyPiece(board, piece, r, c) ? 'capture-highlight' : 'highlight'
+              frontFunctions.canCaptureEnemyPiece(board, piece, to) ? 'capture-highlight' : 'highlight'
             );
           }
         }

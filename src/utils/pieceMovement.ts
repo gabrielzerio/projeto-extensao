@@ -4,44 +4,44 @@ class PcsMvmt {
   constructor() {
     // não utilizado por enquanto
   }
-  isValidMove(piece: Piece, from: Position, toRow: number, toCol: number, board: Board, enPassantTarget?: Position | null): boolean {
-    const targetPiece = board[toRow][toCol];
+  isValidMove(piece: Piece, from: Position, to: Position, board: Board, enPassantTarget?: Position | null): boolean {
+    const targetPiece = board[to.row][to.col];
     if (targetPiece && targetPiece.color === piece.color) return false;
 
     let isValid = false;
     switch (piece.type) {
       case 'pawn':
-        isValid = this.isValidPawnMove(piece, from, toRow, toCol, board, enPassantTarget);
+        isValid = this.isValidPawnMove(piece, from, to, board, enPassantTarget);
         break;
       case 'rook':
-        isValid = this.isValidRookMove(from, toRow, toCol, board);
+        isValid = this.isValidRookMove(from, to, board);
         break;
       case 'knight':
-        isValid = this.isValidKnightMove(from, toRow, toCol, board);
+        isValid = this.isValidKnightMove(from, to, board);
         break;
       case 'bishop':
-        isValid = this.isValidBishopMove(from, toRow, toCol, board);
+        isValid = this.isValidBishopMove(from, to, board);
         break;
       case 'queen':
-        isValid = this.isValidQueenMove(from, toRow, toCol, board);
+        isValid = this.isValidQueenMove(from, to, board);
         break;
       case 'king':
-        isValid = this.isValidKingMove(piece, from, toRow, toCol, board);
+        isValid = this.isValidKingMove(piece, from, to, board);
         break;
     }
 
     if (isValid) {
-      const originalPiece = board[toRow][toCol];
+      const originalPiece = board[to.row][to.col];
       const originalPosition = { ...piece.position };
       
       board[from.row][from.col] = null;
-      board[toRow][toCol] = piece;
-      piece.position = { row: toRow, col: toCol };
+      board[to.row][to.col] = piece;
+      piece.position = { row: to.row, col: to.col };
 
       const inCheck = this.isKingInCheck(piece.color, board);
 
       board[from.row][from.col] = piece;
-      board[toRow][toCol] = originalPiece;
+      board[to.row][to.col] = originalPiece;
       piece.position = originalPosition;
 
       return !inCheck;
@@ -50,31 +50,31 @@ class PcsMvmt {
     return false;
   }
 
-  isValidPawnMove(piece: Piece, from: Position, toRow: number, toCol: number, board: Board, enPassantTarget?: Position | null): boolean {
+  private isValidPawnMove(piece: Piece, from: Position, to: Position, board: Board, enPassantTarget?: Position | null): boolean {
     const direction = piece.color === "white" ? -1 : 1;
     const startRow = piece.color === "white" ? 6 : 1;
 
-    if (from.col === toCol && board[toRow][toCol] === null) {
-      if (toRow === from.row + direction) return true;
+    if (from.col === to.col && board[to.row][to.col] === null) {
+      if (to.row === from.row + direction) return true;
 
       if (
         from.row === startRow &&
-        toRow === from.row + 2 * direction &&
-        board[from.row + direction][toCol] === null
+        to.row === from.row + 2 * direction &&
+        board[from.row + direction][to.col] === null
       ) {
         return true;
       }
     }
 
-    if (Math.abs(from.col - toCol) === 1 && toRow === from.row + direction) {
-      if (board[toRow][toCol] && board[toRow][toCol]!.color !== piece.color) {
+    if (Math.abs(from.col - to.col) === 1 && to.row === from.row + direction) {
+      if (board[to.row][to.col] && board[to.row][to.col]!.color !== piece.color) {
         return true;
       }
 
       if (
         enPassantTarget &&
-        toRow === enPassantTarget.row &&
-        toCol === enPassantTarget.col
+        to.row === enPassantTarget.row &&
+        to.col === enPassantTarget.col
       ) {
         return true;
       }
@@ -83,41 +83,41 @@ class PcsMvmt {
     return false;
   }
 
-  isValidRookMove(from: Position, toRow: number, toCol: number, board: Board): boolean {
-    const rowDiff = Math.abs(from.row - toRow);
-    const colDiff = Math.abs(from.col - toCol);
-    return (rowDiff === 0 || colDiff === 0) && !this.isPathBlocked(from, toRow, toCol, board);
+  isValidRookMove(from: Position, to: Position, board: Board): boolean {
+    const rowDiff = Math.abs(from.row - to.row);
+    const colDiff = Math.abs(from.col - to.col);
+    return (rowDiff === 0 || colDiff === 0) && !this.isPathBlocked(from, to, board);
   }
 
-  isValidBishopMove(from: Position, toRow: number, toCol: number, board: Board): boolean {
-    const rowDiff = Math.abs(from.row - toRow);
-    const colDiff = Math.abs(from.col - toCol);
-    return rowDiff === colDiff && !this.isPathBlocked(from, toRow, toCol, board);
+  isValidBishopMove(from: Position, to: Position, board: Board): boolean {
+    const rowDiff = Math.abs(from.row - to.row);
+    const colDiff = Math.abs(from.col - to.col);
+    return rowDiff === colDiff && !this.isPathBlocked(from, to, board);
   }
 
-  isValidQueenMove(from: Position, toRow: number, toCol: number, board: Board): boolean {
-    return this.isValidRookMove(from, toRow, toCol, board) || 
-           this.isValidBishopMove(from, toRow, toCol, board);
+  isValidQueenMove(from: Position, to: Position, board: Board): boolean {
+    return this.isValidRookMove(from, to, board) || 
+           this.isValidBishopMove(from, to, board);
   }
 
-  isValidKnightMove(from: Position, toRow: number, toCol: number, board: Board): boolean {
-    const rowDiff = Math.abs(from.row - toRow);
-    const colDiff = Math.abs(from.col - toCol);
+  isValidKnightMove(from: Position, to: Position, board: Board): boolean {
+    const rowDiff = Math.abs(from.row - to.row);
+    const colDiff = Math.abs(from.col - to.col);
     
     if ((rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)) {
       const sourcePiece = board[from.row][from.col];
       if (!sourcePiece) return false;
       
-      if (board[toRow][toCol] === null || board[toRow][toCol]?.color !== sourcePiece.color) {
+      if (board[to.row][to.col] === null || board[to.row][to.col]?.color !== sourcePiece.color) {
         return true;
       }
     }
     return false;
   }
 
-  isValidKingMove(piece: Piece, from: Position, toRow: number, toCol: number, board: Board): boolean {
-    const rowDiff = Math.abs(from.row - toRow);
-    const colDiff = Math.abs(from.col - toCol);
+  isValidKingMove(piece: Piece, from: Position, to: Position, board: Board): boolean {
+    const rowDiff = Math.abs(from.row - to.row);
+    const colDiff = Math.abs(from.col - to.col);
 
     if (rowDiff <= 1 && colDiff <= 1) {
       return true;
@@ -129,7 +129,7 @@ class PcsMvmt {
       
       if (piece.hasMoved) return false;
 
-      if (toCol === from.col + 2) {
+      if (to.col === from.col + 2) {
         const rook = board[from.row][7];
         if (!rook || rook.type !== 'rook' || rook.hasMoved) return false;
         
@@ -143,7 +143,7 @@ class PcsMvmt {
         return true;
       }
 
-      if (toCol === from.col - 2) {
+      if (to.col === from.col - 2) {
         const rook = board[from.row][0];
         if (!rook || rook.type !== 'rook' || rook.hasMoved) return false;
         
@@ -175,22 +175,22 @@ class PcsMvmt {
               break;
             }
             case 'rook':
-              if (this.isValidRookMove({row: r, col: c}, row, col, board)) {
+              if (this.isValidRookMove({row: r, col: c}, {row, col}, board)) {
                 return true;
               }
               break;
             case 'knight':
-              if (this.isValidKnightMove({row: r, col: c}, row, col, board)) {
+              if (this.isValidKnightMove({row: r, col: c}, {row, col}, board)) {
                 return true;
               }
               break;
             case 'bishop':
-              if (this.isValidBishopMove({row: r, col: c}, row, col, board)) {
+              if (this.isValidBishopMove({row: r, col: c}, {row, col}, board)) {
                 return true;
               }
               break;
             case 'queen':
-              if (this.isValidQueenMove({row: r, col: c}, row, col, board)) {
+              if (this.isValidQueenMove({row: r, col: c}, {row, col}, board)) {
                 return true;
               }
               break;
@@ -209,14 +209,14 @@ class PcsMvmt {
     return false;
   }
 
-  isPathBlocked(from: Position, toRow: number, toCol: number, board: Board): boolean {
-    const rowStep = Math.sign(toRow - from.row);
-    const colStep = Math.sign(toCol - from.col);
+  isPathBlocked(from: Position, to: Position, board: Board): boolean {
+    const rowStep = Math.sign(to.row - from.row);
+    const colStep = Math.sign(to.col - from.col);
 
     let row = from.row + rowStep;
     let col = from.col + colStep;
 
-    while (row !== toRow || col !== toCol) {
+    while (row !== to.row || col !== to.col) {
       if (board[row][col] !== null) {
         return true;
       }
@@ -255,7 +255,7 @@ class PcsMvmt {
 
       for (let r = 0; r < 8; r++) {
         for (let c = 0; c < 8; c++) {
-          if (this.isValidMove(piece, { row, col }, r, c, board)) {
+          if (this.isValidMove(piece, { row, col }, { row: r, col: c }, board)) {
             const originalPiece = board[r][c];
             const originalPosition = { ...piece.position };
 

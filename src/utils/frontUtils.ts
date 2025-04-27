@@ -1,4 +1,4 @@
-import { Piece, Board, PieceType, PieceColor } from '../models/types';
+import { Piece, Board, PieceType, PieceColor, Position } from '../models/types';
 
 class FunctionsFront {
     removeHighlight(): void {
@@ -114,16 +114,16 @@ class FunctionsFront {
         });
     }
 
-    canCaptureEnemyPiece(board: Board, piece: Piece, toRow: number, toCol: number): boolean {
-        const targetPiece = board[toRow][toCol];
+    canCaptureEnemyPiece(board: Board, piece: Piece, to: Position): boolean {
+        const targetPiece = board[to.row][to.col];
         return targetPiece !== null && targetPiece.color !== piece.color;
     }
 
-    showPromotionDialog(color: PieceColor, row: number, col: number, pieceToSymbol: (piece: Piece) => string): Promise<Piece> {
+    showPromotionDialog(color: PieceColor, position: Position, pieceToSymbol: (piece: Piece) => string): Promise<Piece> {
         const modal = document.getElementById("promotion-modal") as HTMLDialogElement;
         if (!modal) return Promise.reject("Modal not found");
 
-        const square = document.getElementById(`${row}-${col}`);
+        const square = document.getElementById(`${position.row}-${position.col}`);
         if (!square) return Promise.reject("Square not found");
 
         const squareRect = square.getBoundingClientRect();
@@ -151,7 +151,7 @@ class FunctionsFront {
                     resolve({ 
                         type: selectedPiece, 
                         color, 
-                        position: { row, col } 
+                        position: { row: position.row, col: position.col } 
                     });
                 }
             };
@@ -161,7 +161,7 @@ class FunctionsFront {
                 const piece = { 
                     type: (btn.dataset.piece || '') as PieceType, 
                     color, 
-                    position: { row, col } 
+                    position: { row: position.row, col: position.col } 
                 };
                 btn.textContent = pieceToSymbol(piece);
             });
