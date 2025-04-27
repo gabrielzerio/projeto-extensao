@@ -1,4 +1,5 @@
 import { Piece, PieceType, PieceColor, Position, Board, EnPassantTarget } from "./models/types";
+import { handleCastling, pawnPromotion, handleEnPassant, updateEnPassantTarget, revertMove } from "./gameActions";
 
 // Importações
 import FunctionsFront from "./utils/frontUtils.js";
@@ -7,7 +8,7 @@ import FunctionsTutorial from "./tutorial.js";
 
 const movimentos = new PcsMvmt();
 const frontFunctions = new FunctionsFront();
-const tutorialFunctions = new FunctionsTutorial
+const tutorialFunctions = new FunctionsTutorial;
 // Estado do jogo
 const board: Board = Array(8).fill(null).map(() => Array(8).fill(null));
 
@@ -73,7 +74,7 @@ function createBoard(): void {
   }
 }
 
-function pieceToSymbol(piece: Piece): string {
+export function pieceToSymbol(piece: Piece): string {
   const symbols = {
     rook: { white: "♖", black: "♜" },
     knight: { white: "♘", black: "♞" },
@@ -112,95 +113,60 @@ async function handleSquareClick(row: number, col: number): Promise<void> {
   }
 }
 
-async function pawnPromotion(piece: Piece, position: Position): Promise<void> {
-  if (piece.type === "pawn" && (position.row === 0 || position.row === 7)) {
-    const promotedPiece = await frontFunctions.showPromotionDialog(piece.color, position, pieceToSymbol);
-    piece.type = promotedPiece.type as PieceType;
-    const square = document.getElementById(`${position.row}-${position.col}`);
-    const pieceElement = square?.querySelector(".piece");
-    if (pieceElement) {
-      pieceElement.textContent = pieceToSymbol(piece);
-    }
-  }
-}
-
 async function movePiece(piece: Piece, from: Position, to: Position): Promise<boolean> {
-  if (movimentos.isValidMove(piece, from, to, board, enPassantTarget)) {
-    await pawnPromotion(piece, to);
-    const originalPiece = board[to.row][to.col];
-    const originalPosition = { ...piece.position };
-    
-    const isEnPassantMove = piece.type === "pawn" && enPassantTarget && 
-                           to.row === enPassantTarget.row && to.col === enPassantTarget.col;
-    
-    let capturedPawn: Piece | null = null;
+  if (!movimentos.isValidMove(piece, from, to, board, enPassantTarget)) {
+    const moveInfo = document.getElementById('move-info');
+    if (moveInfo) moveInfo.textContent = 'Movimento inválido. Tente novamente.';
+    return false;
+  }
+
+  await pawnPromotion(piece, to, pieceToSymbol);
+  const originalPiece = board[to.row][to.col];
+  const originalPosition = { ...piece.position };
+  
+  const isEnPassantMove = piece.type === "pawn" && enPassantTarget && to.row === enPassantTarget.row && to.col === enPassantTarget.col;
+  
+  let capturedPawn: Piece | null = null;
+  if (isEnPassantMove) {
+    const capturedPawnRow = piece.color === "white" ? to.row + 1 : to.row - 1;
+    capturedPawn = board[capturedPawnRow][to.col];
+  }
+
+  board[from.row][from.col] = null;
+  board[to.row][to.col] = piece;
+  piece.position = { row: to.row, col: to.col };
+
+  try {
     if (isEnPassantMove) {
-      const capturedPawnRow = piece.color === "white" ? to.row + 1 : to.row - 1;
-      capturedPawn = board[capturedPawnRow][to.col];
+      handleEnPassant(piece, to, capturedPawn, board, pieces, removePiece);
     }
 
-    board[from.row][from.col] = null;
-    board[to.row][to.col] = piece;
-    piece.position = { row: to.row, col: to.col };
-
-    if (isEnPassantMove && capturedPawn) {
-      const capturedPawnRow = piece.color === "white" ? to.row + 1 : to.row - 1;
-      board[capturedPawnRow][to.col] = null;
-      removePiece(capturedPawn);
-      const index = pieces.indexOf(capturedPawn);
-      if (index > -1) pieces.splice(index, 1);
-    }
-
-    if (piece.type === 'king' && Math.abs(from.col - to.col) === 2) {
-      const isKingSide = to.col > from.col;
-      const rookCol = isKingSide ? 7 : 0;
-      const newRookCol = isKingSide ? 5 : 3;
-      
-      const rook = board[from.row][rookCol];
-      if (rook) {
-        board[from.row][rookCol] = null;
-        board[from.row][newRookCol] = rook;
-        rook.position = { row: from.row, col: newRookCol };
-        rook.hasMoved = true;
-      }
-    }
-
+    handleCastling(piece, from, to, board);
     piece.hasMoved = true;
 
     if (movimentos.isKingInCheck(piece.color, board)) {
-      board[from.row][from.col] = piece;
-      board[to.row][to.col] = originalPiece;
-      piece.position = originalPosition;
-      
-      if (isEnPassantMove && capturedPawn) {
-        const capturedPawnRow = piece.color === "white" ? to.row + 1 : to.row - 1;
-        board[capturedPawnRow][to.col] = capturedPawn;
-      }
-      
+      revertMove(piece, from, to, originalPiece, originalPosition, capturedPawn, board);
       const moveInfo = document.getElementById('move-info');
       if (moveInfo) moveInfo.textContent = 'Movimento inválido: o rei ficaria em xeque.';
       return false;
     }
 
-    if (piece.type === "pawn" && Math.abs(from.row - to.row) === 2) {
-      enPassantTarget = { row: (from.row + to.row) / 2, col: to.col };
-    } else {
-      enPassantTarget = null;
-    }
-
-    if (originalPiece) {
-      removePiece(originalPiece);
-      const index = pieces.indexOf(originalPiece);
-      if (index > -1) pieces.splice(index, 1);
-    }
-    
-    movePieceAnimation(to, from);
-    return true;
+    enPassantTarget = updateEnPassantTarget(piece, from, to);
+  } catch (error) {
+    revertMove(piece, from, to, originalPiece, originalPosition, capturedPawn, board);
+    const moveInfo = document.getElementById('move-info');
+    if (moveInfo) moveInfo.textContent = error instanceof Error ? error.message : "An unknown error occurred.";
+    return false;
   }
 
-  const moveInfo = document.getElementById('move-info');
-  if (moveInfo) moveInfo.textContent = 'Movimento inválido. Tente novamente.';
-  return false;
+  if (originalPiece) {
+    removePiece(originalPiece);
+    const index = pieces.indexOf(originalPiece);
+    if (index > -1) pieces.splice(index, 1);
+  }
+  
+  movePieceAnimation(to, from);
+  return true;
 }
 
 function movePieceAnimation(to: Position, from: Position): void {
@@ -327,7 +293,6 @@ function showAlerts(): void {
     }
   }
 }
-
 
 toggleTurn();
 

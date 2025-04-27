@@ -1,12 +1,11 @@
 import { describe, it, expect, test, beforeEach } from 'vitest';
-import PcsMvmt from '../src/utils/pieceMovement';
-import { Piece } from '../src/models/types';
-import { Board, EnPassantTarget } from '../src/models/types';
+import PcsMvmt from '../utils/pieceMovement';
+import { Piece } from '../models/types';
+import { Board, EnPassantTarget } from '../models/types';
 
 // const board = createEmptyBoard();
 // placePiece(board, pawn);
 // placePiece(board, enemy);
-
 
 describe('PcsMvmt pawn', () => {
   let board: Board;
@@ -18,14 +17,14 @@ describe('PcsMvmt pawn', () => {
   it('deve validar um movimento de peão para frente', () => {
     const pawn: Piece = { type: 'pawn', color: 'white', position: { row: 6, col: 0 } };
     board[6][0] = pawn;
-    const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, 5, 0, board);
+    const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, { row: 5, col: 0 }, board);
     expect(isValid).toBe(true);
   });
 
   it('deve validar movimento de peão para frente duas casas', () => {
     const pawn: Piece = { type: 'pawn', color: 'white', position: { row: 6, col: 0 } };
     board[6][0] = pawn;
-    const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, 4, 0, board);
+    const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, { row: 4, col: 0 }, board);
     expect(isValid).toBe(true);
   });
 
@@ -34,7 +33,7 @@ describe('PcsMvmt pawn', () => {
     const block: Piece = { type: 'pawn', color: 'white', position: { row: 5, col: 0 } };
     board[6][0] = pawn;
     board[5][0] = block;
-    const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, 5, 0, board);
+    const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, { row: 5, col: 0 }, board);
     expect(isValid).toBe(false);
   });
 
@@ -43,7 +42,7 @@ describe('PcsMvmt pawn', () => {
       const enemy: Piece = { type: 'pawn', color: 'black', position: { row: 5, col: 0 } };
       board[6][0] = pawn;
       board[5][0] = enemy;
-      const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, 5, 0, board);
+      const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, { row: 5, col: 0 }, board);
       expect(isValid).toBe(false);
     }
   )
@@ -52,7 +51,7 @@ describe('PcsMvmt pawn', () => {
     const enemy: Piece = { type: 'pawn', color: 'black', position: { row: 5, col: 1 } };
     board[6][0] = pawn;
     board[5][1] = enemy;
-    const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, 5, 1, board);
+    const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, { row: 5, col: 1 }, board);
     expect(isValid).toBe(true);
   });
 
@@ -61,7 +60,7 @@ describe('PcsMvmt pawn', () => {
     const friend: Piece = { type: 'pawn', color: 'white', position: { row: 5, col: 1 } };
     board[6][0] = pawn;
     board[5][1] = friend;
-    const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, 5, 1, board);
+    const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, { row: 5, col: 1 }, board);
     expect(isValid).toBe(false);
   });
   
@@ -71,7 +70,7 @@ describe('PcsMvmt pawn', () => {
     const piece: Piece = { type: 'pawn', color: 'black', position: { row: 4, col: 0 } };
     board[6][1] = enemy;
     board[4][0] = piece;    
-    const isValid = pcsMvmt.isValidMove(enemy, enemy.position, 4, 1, board, enPassantTarget);
+    const isValid = pcsMvmt.isValidMove(enemy, enemy.position, { row: 4, col: 1 }, board, enPassantTarget);
     expect(isValid).toBe(true);
   });
 });
@@ -87,20 +86,19 @@ describe('PcsMvmt rook', () => {
     const block: Piece = { type: 'pawn', color: 'white', position: { row: 6, col: 0 } };
     board[7][0] = rook;
     board[6][0] = block;
-    const isValid = pcsMvmt.isValidMove(rook, { row: 7, col: 0 }, 4, 0, board);
+    const isValid = pcsMvmt.isValidMove(rook, { row: 7, col: 0 }, { row: 4, col: 0 }, board);
     expect(isValid).toBe(false);
   });
   
   it('deve validar movimento de torre em linha reta', () => {
     const rook: Piece = { type: 'rook', color: 'white', position: { row: 7, col: 0 } };
     board[7][0] = rook;
-    const isValid = pcsMvmt.isValidMove(rook, { row: 7, col: 0 }, 4, 0, board);
+    const isValid = pcsMvmt.isValidMove(rook, { row: 7, col: 0 }, { row: 4, col: 0 }, board);
     expect(isValid).toBe(true);
   });
 
 
 });
-
 
 describe('PcsMvmt knight', () => {
   const pcsMvmt = new PcsMvmt();
@@ -113,7 +111,7 @@ describe('PcsMvmt knight', () => {
     const block: Piece = { type: 'pawn', color: 'white', position: { row: 6, col: 1 } };
     board[7][1] = knight;
     board[6][1] = block;
-    const isValid = pcsMvmt.isValidMove(knight, { row: 7, col: 1 }, 5, 2, board);
+    const isValid = pcsMvmt.isValidMove(knight, { row: 7, col: 1 }, { row: 5, col: 2 }, board);
     expect(isValid).toBe(true);
   });
 
@@ -122,7 +120,7 @@ describe('PcsMvmt knight', () => {
     const friend: Piece = { type: 'pawn', color: 'white', position: { row: 5, col: 2 } };
     board[7][1] = knight;
     board[5][2] = friend;
-    const isValid = pcsMvmt.isValidMove(knight, { row: 7, col: 1 }, 5, 2, board);
+    const isValid = pcsMvmt.isValidMove(knight, { row: 7, col: 1 }, { row: 5, col: 2 }, board);
     expect(isValid).toBe(false);
   });
 });
