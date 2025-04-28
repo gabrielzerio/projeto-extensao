@@ -11,8 +11,8 @@ export class Queen extends Piece {
     const colDiff = Math.abs(from.col - to.col);
 
     if ((rowDiff === colDiff || rowDiff === 0 || colDiff === 0) && 
-        this.canMoveToPosition(to, board)) {
-      return !this.isPathBlocked(from, to, board);
+        !this.isPathBlocked(from, to, board)) {
+      return this.isMoveValid(from, to, board);
     }
     return false;
   }

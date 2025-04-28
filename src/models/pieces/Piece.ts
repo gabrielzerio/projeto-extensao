@@ -28,11 +28,6 @@ export abstract class Piece {
     return false;
   }
 
-  protected canMoveToPosition(to: Position, board: Board): boolean {
-    const targetPiece = board[to.row][to.col];
-    return !targetPiece || targetPiece.color !== this.color;
-  }
-
   async move(from: Position, to: Position, board: Board): Promise<boolean> {
     if (!this.isValidMove(from, to, board)) return false;
 
@@ -51,6 +46,7 @@ export abstract class Piece {
       board[from.row][from.col] = this;
       board[to.row][to.col] = originalPiece;
       this.position = originalPosition;
+      console.log('nao vai n');
       return false;
     }
 
@@ -58,15 +54,52 @@ export abstract class Piece {
     return true;
   }
 
+  protected simulateMove(from: Position, to: Position, board: Board, callback: () => boolean): boolean {
+    const originalPiece = board[to.row][to.col];
+    const originalPosition = { ...this.position };
+
+    // Faz o movimento temporariamente
+    board[from.row][from.col] = null;
+    board[to.row][to.col] = this;
+    this.position = to;
+
+    const result = callback();
+
+    // Desfaz o movimento
+    board[from.row][from.col] = this;
+    board[to.row][to.col] = originalPiece;
+    this.position = originalPosition;
+
+    return result;
+  }
+
+  protected isMoveValid(from: Position, to: Position, board: Board): boolean {
+    // Verifica se pode mover para a casa (vazia ou captura)
+    const targetPiece = board[to.row][to.col];
+    if (targetPiece && targetPiece.color === this.color) {
+      return false;
+    }
+
+    // Verifica se o movimento deixaria o rei em xeque
+    const king = this.findKing(this.color, board);
+    if (!king) return false;
+
+    return this.simulateMove(from, to, board, () => !king.isInCheck(board));
+  }
+
   showPossibleMoves(board: Board): Position[] {
     const possibleMoves: Position[] = [];
+    
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
-        if (this.isValidMove(this.position, { row: r, col: c }, board)) {
-          possibleMoves.push({ row: r, col: c });
+        const to = { row: r, col: c };
+        if (this.isValidMove(this.position, to, board) && 
+            this.isMoveValid(this.position, to, board)) {
+          possibleMoves.push(to);
         }
       }
     }
+    
     return possibleMoves;
   }
 

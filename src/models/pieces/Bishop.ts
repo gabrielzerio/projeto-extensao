@@ -7,12 +7,13 @@ export class Bishop extends Piece {
   }
 
   isValidMove(from: Position, to: Position, board: Board): boolean {
+    return this.isValidPattern(from, to, board) && this.isMoveValid(from, to, board);
+  }
+
+  protected isValidPattern(from: Position, to: Position, board: Board): boolean {
     const rowDiff = Math.abs(from.row - to.row);
     const colDiff = Math.abs(from.col - to.col);
 
-    if (rowDiff === colDiff && this.canMoveToPosition(to, board)) {
-      return !this.isPathBlocked(from, to, board);
-    }
-    return false;
+    return rowDiff === colDiff && !this.isPathBlocked(from, to, board);
   }
 }

@@ -168,6 +168,7 @@ function showPossibleMoves(piece: Piece, row: number, col: number): void {
   frontFunctions.removeHighlight();
   
   const possibleMoves = piece.showPossibleMoves(board);
+  console.log("Movimentos possíveis:", possibleMoves);
   
   possibleMoves.forEach(move => {
     const square = document.getElementById(`${move.row}-${move.col}`);

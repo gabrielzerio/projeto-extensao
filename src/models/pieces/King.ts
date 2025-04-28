@@ -7,31 +7,45 @@ export class King extends Piece {
   }
 
   isValidMove(from: Position, to: Position, board: Board): boolean {
-    const rowDiff = Math.abs(from.row - to.row);
-    const colDiff = Math.abs(from.col - to.col);
+    const rowDiff = Math.abs(to.row - from.row);
+    const colDiff = Math.abs(to.col - from.col);
 
     // Movimento normal do rei
     if (rowDiff <= 1 && colDiff <= 1) {
-      return this.canMoveToPosition(to, board);
+      return this.isMoveValid(from, to, board);
     }
 
     // Roque
     if (!this.hasMoved && rowDiff === 0 && colDiff === 2) {
-      const row = from.row;
-      const rookCol = to.col > from.col ? 7 : 0;
-      const rook = board[row][rookCol];
-
-      if (!rook || rook.type !== 'rook' || rook.hasMoved) return false;
-
-      const step = to.col > from.col ? 1 : -1;
-      for (let col = from.col + step; col !== rookCol; col += step) {
-        if (board[row][col]) return false;
-      }
-
-      return true;
+      return this.isCastlingValid(from, to, board);
     }
 
     return false;
+  }
+
+  private isCastlingValid(from: Position, to: Position, board: Board): boolean {
+    if (this.isInCheck(board)) return false;
+
+    const isKingSide = to.col > from.col;
+    const rookCol = isKingSide ? 7 : 0;
+    const rook = board[from.row][rookCol];
+
+    if (!rook || rook.type !== 'rook' || rook.hasMoved) return false;
+
+    const pathCols = isKingSide ? [5, 6] : [3, 2, 1];
+    const checkCols = isKingSide ? [5, 6] : [3, 2];
+
+    // Verifica se o caminho está livre
+    if (pathCols.some(col => board[from.row][col] !== null)) return false;
+
+    // Verifica se as casas do caminho estão sob ataque
+    for (let col of checkCols) {
+      if (this.isSquareUnderAttack(from.row, col, this.color, board)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   isInCheck(board: Board): boolean {
@@ -88,63 +102,15 @@ export class King extends Piece {
       });
   }
 
-  canCastleKingSide(board: Board): boolean {
-    if (this.hasMoved) return false;
-    const rook = board[this.position.row][7];
-    if (!rook || rook.type !== 'rook' || rook.hasMoved) return false;
-
-    return !board[this.position.row][5] && 
-           !board[this.position.row][6] &&
-           !this.isPathUnderAttack(board, [5, 6]);
-  }
-
-  canCastleQueenSide(board: Board): boolean {
-    if (this.hasMoved) return false;
-    const rook = board[this.position.row][0];
-    if (!rook || rook.type !== 'rook' || rook.hasMoved) return false;
-
-    return !board[this.position.row][1] && 
-           !board[this.position.row][2] && 
-           !board[this.position.row][3] &&
-           !this.isPathUnderAttack(board, [2, 3]);
-  }
-
-  private isPathUnderAttack(board: Board, cols: number[]): boolean {
-    return cols.some(col => 
-      this.isSquareUnderAttack(this.position.row, col, this.color, board));
-  }
-
-  isUnderAttack(board: Board): boolean {
-    return this.isSquareUnderAttack(this.position.row, this.position.col, this.color, board);
-  }
-
-  showPossibleMoves(board: Board): Position[] {
-    const moves = super.showPossibleMoves(board);
-
-    if (!this.hasMoved) {
-      if (this.canCastleKingSide(board)) {
-        moves.push({ row: this.position.row, col: this.position.col + 2 });
-      }
-      if (this.canCastleQueenSide(board)) {
-        moves.push({ row: this.position.row, col: this.position.col - 2 });
-      }
-    }
-
-    return moves;
-  }
-
   handleCastling(from: Position, to: Position, board: Board): void {
-    if (Math.abs(from.col - to.col) !== 2) return;
+    const colDiff = to.col - from.col;
+    if (Math.abs(colDiff) !== 2) return;
 
-    if (this.hasMoved) {
-      throw new Error('Invalid castling: King has already moved');
-    }
-
-    const isKingSide = to.col > from.col;
+    const isKingSide = colDiff > 0;
     const rookCol = isKingSide ? 7 : 0;
     const newRookCol = isKingSide ? 5 : 3;
-
     const rook = board[from.row][rookCol];
+
     if (rook) {
       board[from.row][rookCol] = null;
       board[from.row][newRookCol] = rook;
@@ -154,24 +120,92 @@ export class King extends Piece {
   }
 
   async move(from: Position, to: Position, board: Board): Promise<boolean> {
+    if (!this.isValidMove(from, to, board)) return false;
+
     const success = await super.move(from, to, board);
     if (!success) return false;
 
-    try {
-      this.handleCastling(from, to, board);
-      
-      if (this.isInCheck(board)) {
-        throw new Error('Movimento inválido: o rei ficaria em xeque.');
+    this.handleCastling(from, to, board);
+    return true;
+  }
+
+  canCastleKingSide(board: Board): boolean {
+    if (this.hasMoved || this.isInCheck(board)) return false;
+
+    const rook = board[this.position.row][7];
+    if (!rook || rook.type !== 'rook' || rook.hasMoved) return false;
+
+    // Verifica se o caminho está livre e não ameaçado
+    const pathCols = [5, 6];
+    return pathCols.every(col => {
+      if (board[this.position.row][col] !== null) return false;
+
+      // Simula o movimento do rei para cada casa do caminho
+      const originalPosition = { ...this.position };
+      board[this.position.row][this.position.col] = null;
+      this.position = { row: this.position.row, col };
+      board[this.position.row][col] = this;
+
+      const isSquareSafe = !this.isInCheck(board);
+
+      // Desfaz a simulação
+      board[this.position.row][col] = null;
+      this.position = originalPosition;
+      board[this.position.row][this.position.col] = this;
+
+      return isSquareSafe;
+    });
+  }
+
+  canCastleQueenSide(board: Board): boolean {
+    if (this.hasMoved || this.isInCheck(board)) return false;
+
+    const rook = board[this.position.row][0];
+    if (!rook || rook.type !== 'rook' || rook.hasMoved) return false;
+
+    // Verifica se o caminho está livre e não ameaçado
+    const pathCols = [3, 2, 1];
+    return pathCols.every(col => {
+      if (board[this.position.row][col] !== null) return false;
+
+      // Não precisamos verificar a ameaça na casa da torre
+      if (col === 1) return true;
+
+      // Simula o movimento do rei para cada casa do caminho
+      const originalPosition = { ...this.position };
+      board[this.position.row][this.position.col] = null;
+      this.position = { row: this.position.row, col };
+      board[this.position.row][col] = this;
+
+      const isSquareSafe = !this.isInCheck(board);
+
+      // Desfaz a simulação
+      board[this.position.row][col] = null;
+      this.position = originalPosition;
+      board[this.position.row][this.position.col] = this;
+
+      return isSquareSafe;
+    });
+  }
+
+  isUnderAttack(board: Board): boolean {
+    return this.isSquareUnderAttack(this.position.row, this.position.col, this.color, board);
+  }
+
+  showPossibleMoves(board: Board): Position[] {
+    const normalMoves = super.showPossibleMoves(board);
+    
+    if (!this.hasMoved && !this.isInCheck(board)) {
+      // Adiciona posições de roque se válidas
+      const row = this.position.row;
+      if (this.isCastlingValid(this.position, { row, col: this.position.col + 2 }, board)) {
+        normalMoves.push({ row, col: this.position.col + 2 });
       }
-      
-      return true;
-    } catch (error) {
-      // Reverte o movimento em caso de erro
-      board[from.row][from.col] = this;
-      board[to.row][to.col] = null;
-      this.position = from;
-      this.hasMoved = false;
-      throw error;
+      if (this.isCastlingValid(this.position, { row, col: this.position.col - 2 }, board)) {
+        normalMoves.push({ row, col: this.position.col - 2 });
+      }
     }
+    
+    return normalMoves;
   }
 }

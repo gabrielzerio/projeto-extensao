@@ -10,7 +10,9 @@ export class Knight extends Piece {
     const rowDiff = Math.abs(from.row - to.row);
     const colDiff = Math.abs(from.col - to.col);
 
-    return ((rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)) 
-           && this.canMoveToPosition(to, board);
+    if ((rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)) {
+      return this.isMoveValid(from, to, board);
+    }
+    return false;
   }
 }
