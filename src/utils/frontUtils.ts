@@ -155,11 +155,7 @@ class FunctionsFront {
 
             buttons.forEach(btn => {
                 btn.addEventListener("click", handleClick);
-                const piece = { 
-                    type: (btn.dataset.piece || '') as PieceType, 
-                    color, 
-                    position: { row: position.row, col: position.col } 
-                };
+                const piece = {type: (btn.dataset.piece || '') as PieceType, color, position: { row: position.row, col: position.col }} as Piece;
                 btn.textContent = pieceToSymbol(piece);
             });
         });

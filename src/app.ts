@@ -172,8 +172,11 @@ function showPossibleMoves(piece: Piece, row: number, col: number): void {
   possibleMoves.forEach(move => {
     const square = document.getElementById(`${move.row}-${move.col}`);
     if (square) {
+      // Verifica se há uma peça na casa de destino
+      const targetPiece = board[move.row][move.col];
+      // Adiciona highlight vermelho apenas se houver uma peça inimiga
       square.classList.add(
-        board[move.row][move.col]?.color !== piece.color ? 
+        targetPiece && targetPiece.color !== piece.color ? 
         'capture-highlight' : 
         'highlight'
       );
