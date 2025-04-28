@@ -2,6 +2,7 @@ import { Piece } from './Piece';
 import { Position, Board, EnPassantTarget } from '../types';
 import FunctionsFront from '../../utils/frontUtils';
 import { pieceToSymbol } from '../../app';
+import { PieceFactory } from '../PieceFactory';
 
 export class Pawn extends Piece {
   constructor(color: 'white' | 'black', position: Position) {
@@ -42,16 +43,22 @@ export class Pawn extends Piece {
     return this.isValidPattern(from, to, board, enPassantTarget) && this.isMoveSafe(from, to, board);
   }
 
-  async promote(position: Position, pieceToSymbol: (piece: Piece) => string): Promise<void> {
+  async promote(position: Position, board: Board, pieceToSymbol: (piece: Piece) => string): Promise<void> {
     if (position.row === 0 || position.row === 7) {
       const frontFunctions = new FunctionsFront();
-      const promotedPiece = await frontFunctions.showPromotionDialog(this.color, position, pieceToSymbol);
-      this.setType(promotedPiece.type);
+      const promotedPieceType = await frontFunctions.showPromotionDialog(this.color, position, pieceToSymbol);
       
+      // Criar uma nova peça do tipo escolhido
+      const newPiece = PieceFactory.createPiece(promotedPieceType.type, this.color, position);
+      
+      // Substituir o peão no tabuleiro pela nova peça
+      board[position.row][position.col] = newPiece;
+      
+      // Atualizar o visual
       const square = document.getElementById(`${position.row}-${position.col}`);
       const pieceElement = square?.querySelector(".piece");
       if (pieceElement) {
-        pieceElement.textContent = pieceToSymbol(this);
+        pieceElement.textContent = pieceToSymbol(newPiece);
       }
     }
   }
@@ -80,7 +87,7 @@ export class Pawn extends Piece {
       board[capturedPawnRow][to.col] = null;
     }
 
-    await this.promote(to, pieceToSymbol);
+    await this.promote(to, board, pieceToSymbol);
     return true;
   }
 }
