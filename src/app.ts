@@ -120,7 +120,7 @@ async function movePiece(piece: Piece, from: Position, to: Position): Promise<bo
     const originalPiece = board[to.row][to.col];
     const context: any = { enPassantTarget };
     if (piece instanceof Pawn) {
-      context.showPromotionDialog = async (color: string, position: Position) => {
+      context.showPromotionDialog = async (color: PieceColor, position: Position) => {
         return await frontFunctions.showPromotionDialog(color, position, pieceToSymbol);
       };
     }
@@ -173,7 +173,7 @@ function showPossibleMoves(piece: Piece, row: number, col: number): void {
 
   const context: any = { enPassantTarget };
   if (piece instanceof Pawn) {
-    context.showPromotionDialog = async (color: string, position: Position) => {
+    context.showPromotionDialog = async (color: PieceColor, position: Position) => {
       return await frontFunctions.showPromotionDialog(color, position, pieceToSymbol);
     };
   }

@@ -1,5 +1,5 @@
 import { Piece, MoveContext } from './Piece';
-import { Position, Board } from '../types';
+import { Position, Board, PieceType } from '../types';
 import { promotePawn } from '../../utils/promotionUtils';
 
 export class Pawn extends Piece {
@@ -53,12 +53,7 @@ export class Pawn extends Piece {
     return null;
   }
 
-  async move(
-    from: Position,
-    to: Position,
-    board: Board,
-    context: MoveContext = {}
-  ): Promise<boolean> {
+  async move(from: Position, to: Position, board: Board, context: MoveContext = {}): Promise<boolean> {
     const success = await super.move(from, to, board, context);
     if (!success) return false;
 
@@ -74,12 +69,7 @@ export class Pawn extends Piece {
 
     // Só chama promotePawn se o callback existir
     if (typeof context.showPromotionDialog === 'function') {
-      await promotePawn(
-        this,
-        to,
-        board,
-        context.showPromotionDialog
-      );
+      await promotePawn(this, to, board, context.showPromotionDialog);
     }
     return true;
   }

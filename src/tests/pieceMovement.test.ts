@@ -1,149 +1,148 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { PieceFactory } from '../models/PieceFactory';
-import { Board } from '../models/types';
-import PcsMvmt from '../utils/pieceMovement';
+// Ajuste as importações conforme a nova arquitetura
+import { criarTabuleiroVazio, criarPeca } from '../models/novoFactory'; // Exemplo de importação
+import { validarMovimento } from '../utils/novoMovimento'; // Exemplo de importação
 
-describe('Piece Movement Tests', () => {
-  let board: Board;
-  const pcsMvmt = new PcsMvmt();
+describe('Testes de Movimento das Peças', () => {
+  let tabuleiro: any;
 
   beforeEach(() => {
-    board = Array(8).fill(null).map(() => Array(8).fill(null));
+    tabuleiro = criarTabuleiroVazio();
   });
 
-  describe('Pawn Tests', () => {
-    it('deve validar um movimento de peão para frente', () => {
-      const pawn = PieceFactory.createPiece('pawn', 'white', { row: 6, col: 0 });
-      board[6][0] = pawn;
-      const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, { row: 5, col: 0 }, board);
-      expect(isValid).toBe(true);
+  describe('Peão', () => {
+    it('deve permitir movimento simples para frente', () => {
+      const peao = criarPeca('peao', 'branco', { linha: 6, coluna: 0 });
+      tabuleiro[6][0] = peao;
+      const valido = validarMovimento(peao, { linha: 6, coluna: 0 }, { linha: 5, coluna: 0 }, tabuleiro);
+      expect(valido).toBe(true);
     });
 
-    it('deve validar movimento de peão para frente duas casas', () => {
-      const pawn = PieceFactory.createPiece('pawn', 'white', { row: 6, col: 0 });
-      board[6][0] = pawn;
-      const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, { row: 4, col: 0 }, board);
-      expect(isValid).toBe(true);
+    it('deve permitir movimento duplo inicial', () => {
+      const peao = criarPeca('peao', 'branco', { linha: 6, coluna: 0 });
+      tabuleiro[6][0] = peao;
+      const valido = validarMovimento(peao, { linha: 6, coluna: 0 }, { linha: 4, coluna: 0 }, tabuleiro);
+      expect(valido).toBe(true);
     });
 
-    it('não deve permitir peão avançar se houver peça na frente', () => {
-      const pawn = PieceFactory.createPiece('pawn', 'white', { row: 6, col: 0 });
-      const block = PieceFactory.createPiece('pawn', 'white', { row: 5, col: 0 });
-      board[6][0] = pawn;
-      board[5][0] = block;
-      const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, { row: 5, col: 0 }, board);
-      expect(isValid).toBe(false);
+    it('não deve permitir avançar com peça na frente', () => {
+      const peao = criarPeca('peao', 'branco', { linha: 6, coluna: 0 });
+      const bloqueio = criarPeca('torre', 'branco', { linha: 5, coluna: 0 });
+      tabuleiro[6][0] = peao;
+      tabuleiro[5][0] = bloqueio;
+      const valido = validarMovimento(peao, { linha: 6, coluna: 0 }, { linha: 5, coluna: 0 }, tabuleiro);
+      expect(valido).toBe(false);
     });
 
-    it('deve validar o peão não capturar peça inimiga na reta', () => {
-      const pawn = PieceFactory.createPiece('pawn', 'white', { row: 6, col: 0 });
-      const enemy = PieceFactory.createPiece('pawn', 'black', { row: 5, col: 0 });
-      board[6][0] = pawn;
-      board[5][0] = enemy;
-      const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, { row: 5, col: 0 }, board);
-      expect(isValid).toBe(false);
+    it('não deve capturar peça inimiga em linha reta', () => {
+      const peao = criarPeca('peao', 'branco', { linha: 6, coluna: 0 });
+      const inimigo = criarPeca('peao', 'preto', { linha: 5, coluna: 0 });
+      tabuleiro[6][0] = peao;
+      tabuleiro[5][0] = inimigo;
+      const valido = validarMovimento(peao, { linha: 6, coluna: 0 }, { linha: 5, coluna: 0 }, tabuleiro);
+      expect(valido).toBe(false);
     });
 
-    it('deve validar captura diagonal de peão inimigo', () => {
-      const pawn = PieceFactory.createPiece('pawn', 'white', { row: 6, col: 0 });
-      const enemy = PieceFactory.createPiece('pawn', 'black', { row: 5, col: 1 });
-      board[6][0] = pawn;
-      board[5][1] = enemy;
-      const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, { row: 5, col: 1 }, board);
-      expect(isValid).toBe(true);
+    it('deve capturar peça inimiga na diagonal', () => {
+      const peao = criarPeca('peao', 'branco', { linha: 6, coluna: 0 });
+      const inimigo = criarPeca('peao', 'preto', { linha: 5, coluna: 1 });
+      tabuleiro[6][0] = peao;
+      tabuleiro[5][1] = inimigo;
+      const valido = validarMovimento(peao, { linha: 6, coluna: 0 }, { linha: 5, coluna: 1 }, tabuleiro);
+      expect(valido).toBe(true);
     });
 
-    it('não deve permitir peão capturar peça da mesma cor', () => {
-      const pawn = PieceFactory.createPiece('pawn', 'white', { row: 6, col: 0 });
-      const friend = PieceFactory.createPiece('pawn', 'white', { row: 5, col: 1 });
-      board[6][0] = pawn;
-      board[5][1] = friend;
-      const isValid = pcsMvmt.isValidMove(pawn, { row: 6, col: 0 }, { row: 5, col: 1 }, board);
-      expect(isValid).toBe(false);
+    it('não deve capturar peça da mesma cor', () => {
+      const peao = criarPeca('peao', 'branco', { linha: 6, coluna: 0 });
+      const amigo = criarPeca('torre', 'branco', { linha: 5, coluna: 1 });
+      tabuleiro[6][0] = peao;
+      tabuleiro[5][1] = amigo;
+      const valido = validarMovimento(peao, { linha: 6, coluna: 0 }, { linha: 5, coluna: 1 }, tabuleiro);
+      expect(valido).toBe(false);
     });
 
-    it('valida funcionalidade en passant', () => {
-      const enPassantTarget = { row: 5, col: 1 };
-      const enemy = PieceFactory.createPiece('pawn', 'white', { row: 6, col: 1 });
-      const piece = PieceFactory.createPiece('pawn', 'black', { row: 4, col: 0 });
-      board[6][1] = enemy;
-      board[4][0] = piece;
-      const isValid = pcsMvmt.isValidMove(enemy, enemy.position, { row: 4, col: 1 }, board, enPassantTarget);
-      expect(isValid).toBe(true);
-    });
-  });
-
-  describe('Rook Tests', () => {
-    it('não deve permitir torre pular peça', () => {
-      const rook = PieceFactory.createPiece('rook', 'white', { row: 7, col: 0 });
-      const block = PieceFactory.createPiece('pawn', 'white', { row: 6, col: 0 });
-      board[7][0] = rook;
-      board[6][0] = block;
-      const isValid = pcsMvmt.isValidMove(rook, { row: 7, col: 0 }, { row: 4, col: 0 }, board);
-      expect(isValid).toBe(false);
-    });
-
-    it('deve validar movimento de torre em linha reta', () => {
-      const rook = PieceFactory.createPiece('rook', 'white', { row: 7, col: 0 });
-      board[7][0] = rook;
-      const isValid = pcsMvmt.isValidMove(rook, { row: 7, col: 0 }, { row: 4, col: 0 }, board);
-      expect(isValid).toBe(true);
+    it('deve permitir en passant', () => {
+      const alvoEnPassant = { linha: 5, coluna: 1 };
+      const peaoBranco = criarPeca('peao', 'branco', { linha: 6, coluna: 1 });
+      const peaoPreto = criarPeca('peao', 'preto', { linha: 4, coluna: 0 });
+      tabuleiro[6][1] = peaoBranco;
+      tabuleiro[4][0] = peaoPreto;
+      const valido = validarMovimento(peaoBranco, { linha: 6, coluna: 1 }, { linha: 4, coluna: 1 }, tabuleiro, alvoEnPassant);
+      expect(valido).toBe(true);
     });
   });
 
-  describe('Knight Tests', () => {
-    it('deve validar movimento de cavalo pulando peças', () => {
-      const knight = PieceFactory.createPiece('knight', 'white', { row: 7, col: 1 });
-      const block = PieceFactory.createPiece('pawn', 'white', { row: 6, col: 1 });
-      board[7][1] = knight;
-      board[6][1] = block;
-      const isValid = pcsMvmt.isValidMove(knight, { row: 7, col: 1 }, { row: 5, col: 2 }, board);
-      expect(isValid).toBe(true);
+  describe('Torre', () => {
+    it('não deve pular peças', () => {
+      const torre = criarPeca('torre', 'branco', { linha: 7, coluna: 0 });
+      const bloqueio = criarPeca('peao', 'branco', { linha: 6, coluna: 0 });
+      tabuleiro[7][0] = torre;
+      tabuleiro[6][0] = bloqueio;
+      const valido = validarMovimento(torre, { linha: 7, coluna: 0 }, { linha: 4, coluna: 0 }, tabuleiro);
+      expect(valido).toBe(false);
     });
 
-    it('não deve permitir cavalo capturar peça da mesma cor', () => {
-      const knight = PieceFactory.createPiece('knight', 'white', { row: 7, col: 1 });
-      const friend = PieceFactory.createPiece('pawn', 'white', { row: 5, col: 2 });
-      board[7][1] = knight;
-      board[5][2] = friend;
-      const isValid = pcsMvmt.isValidMove(knight, { row: 7, col: 1 }, { row: 5, col: 2 }, board);
-      expect(isValid).toBe(false);
+    it('deve andar em linha reta', () => {
+      const torre = criarPeca('torre', 'branco', { linha: 7, coluna: 0 });
+      tabuleiro[7][0] = torre;
+      const valido = validarMovimento(torre, { linha: 7, coluna: 0 }, { linha: 4, coluna: 0 }, tabuleiro);
+      expect(valido).toBe(true);
     });
   });
 
-  describe('Bishop Tests', () => {
-    it('deve validar movimento diagonal do bispo', () => {
-      const bishop = PieceFactory.createPiece('bishop', 'white', { row: 7, col: 2 });
-      board[7][2] = bishop;
-      const isValid = pcsMvmt.isValidMove(bishop, { row: 7, col: 2 }, { row: 5, col: 4 }, board);
-      expect(isValid).toBe(true);
+  describe('Cavalo', () => {
+    it('deve pular peças', () => {
+      const cavalo = criarPeca('cavalo', 'branco', { linha: 7, coluna: 1 });
+      const bloqueio = criarPeca('peao', 'branco', { linha: 6, coluna: 1 });
+      tabuleiro[7][1] = cavalo;
+      tabuleiro[6][1] = bloqueio;
+      const valido = validarMovimento(cavalo, { linha: 7, coluna: 1 }, { linha: 5, coluna: 2 }, tabuleiro);
+      expect(valido).toBe(true);
+    });
+
+    it('não deve capturar peça da mesma cor', () => {
+      const cavalo = criarPeca('cavalo', 'branco', { linha: 7, coluna: 1 });
+      const amigo = criarPeca('peao', 'branco', { linha: 5, coluna: 2 });
+      tabuleiro[7][1] = cavalo;
+      tabuleiro[5][2] = amigo;
+      const valido = validarMovimento(cavalo, { linha: 7, coluna: 1 }, { linha: 5, coluna: 2 }, tabuleiro);
+      expect(valido).toBe(false);
     });
   });
 
-  describe('Queen Tests', () => {
-    it('deve validar movimento diagonal da rainha', () => {
-      const queen = PieceFactory.createPiece('queen', 'white', { row: 7, col: 3 });
-      board[7][3] = queen;
-      const isValid = pcsMvmt.isValidMove(queen, { row: 7, col: 3 }, { row: 5, col: 5 }, board);
-      expect(isValid).toBe(true);
+  describe('Bispo', () => {
+    it('deve andar na diagonal', () => {
+      const bispo = criarPeca('bispo', 'branco', { linha: 7, coluna: 2 });
+      tabuleiro[7][2] = bispo;
+      const valido = validarMovimento(bispo, { linha: 7, coluna: 2 }, { linha: 5, coluna: 4 }, tabuleiro);
+      expect(valido).toBe(true);
     });
   });
 
-  describe('King Tests', () => {
-    it('deve validar movimento básico do rei', () => {
-      const king = PieceFactory.createPiece('king', 'white', { row: 7, col: 4 });
-      board[7][4] = king;
-      const isValid = pcsMvmt.isValidMove(king, { row: 7, col: 4 }, { row: 6, col: 4 }, board);
-      expect(isValid).toBe(true);
+  describe('Rainha', () => {
+    it('deve andar na diagonal', () => {
+      const rainha = criarPeca('rainha', 'branco', { linha: 7, coluna: 3 });
+      tabuleiro[7][3] = rainha;
+      const valido = validarMovimento(rainha, { linha: 7, coluna: 3 }, { linha: 5, coluna: 5 }, tabuleiro);
+      expect(valido).toBe(true);
+    });
+  });
+
+  describe('Rei', () => {
+    it('deve andar uma casa', () => {
+      const rei = criarPeca('rei', 'branco', { linha: 7, coluna: 4 });
+      tabuleiro[7][4] = rei;
+      const valido = validarMovimento(rei, { linha: 7, coluna: 4 }, { linha: 6, coluna: 4 }, tabuleiro);
+      expect(valido).toBe(true);
     });
 
-    it('deve validar roque', () => {
-      const king = PieceFactory.createPiece('king', 'white', { row: 7, col: 4 });
-      const rook = PieceFactory.createPiece('rook', 'white', { row: 7, col: 7 });
-      board[7][4] = king;
-      board[7][7] = rook;
-      const isValid = pcsMvmt.isValidMove(king, { row: 7, col: 4 }, { row: 7, col: 6 }, board);
-      expect(isValid).toBe(true);
+    it('deve permitir roque', () => {
+      const rei = criarPeca('rei', 'branco', { linha: 7, coluna: 4 });
+      const torre = criarPeca('torre', 'branco', { linha: 7, coluna: 7 });
+      tabuleiro[7][4] = rei;
+      tabuleiro[7][7] = torre;
+      const valido = validarMovimento(rei, { linha: 7, coluna: 4 }, { linha: 7, coluna: 6 }, tabuleiro);
+      expect(valido).toBe(true);
     });
   });
 });

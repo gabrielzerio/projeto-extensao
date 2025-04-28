@@ -6,7 +6,7 @@ import { King } from './King';
  */
 export interface MoveContext {
   enPassantTarget?: Position;
-  showPromotionDialog?: (color: string, position: Position) => Promise<{ type: string }>;
+  showPromotionDialog?: (color: PieceColor, position: Position) => Promise< PieceType >;
   // outros campos especiais podem ser adicionados aqui
 }
 

@@ -1,4 +1,4 @@
-import { Position, Board } from '../models/types';
+import { Position } from '../models/types';
 
 export function isStraightLine(from: Position, to: Position): boolean {
   return from.row === to.row || from.col === to.col;

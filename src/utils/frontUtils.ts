@@ -120,46 +120,50 @@ class FunctionsFront {
         return targetPiece !== null && targetPiece.color !== piece.color;
     }
 
-    showPromotionDialog(color: PieceColor, position: Position, pieceToSymbol: (piece: Piece) => string): Promise<Piece> {
+    showPromotionDialog(
+        color: PieceColor,
+        position: Position,
+        pieceToSymbol: (piece: Piece) => string
+      ): Promise<PieceType > {
         const modal = document.getElementById("promotion-modal") as HTMLDialogElement;
         if (!modal) return Promise.reject("Modal not found");
-
+      
         const square = document.getElementById(`${position.row}-${position.col}`);
         if (!square) return Promise.reject("Square not found");
-
+      
         const squareRect = square.getBoundingClientRect();
-        
+      
         modal.style.left = `${squareRect.left}px`;
-        modal.style.top = color === 'white' ? 
-            `${squareRect.top - 60}px` : 
-            `${squareRect.bottom}px`;
-        
+        modal.style.top = color === 'white'
+          ? `${squareRect.top - 60}px`
+          : `${squareRect.bottom}px`;
+      
         modal.showModal();
-
+      
         return new Promise((resolve) => {
-            const buttons = modal.querySelectorAll<HTMLButtonElement>(".piece-btn");
-            
-            const handleClick = (event: Event) => {
-                const target = event.target as HTMLButtonElement;
-                const selectedPiece = target.dataset.piece as PieceType;
-                buttons.forEach(btn => btn.removeEventListener("click", handleClick));
-                modal.close();
-                
-                modal.style.left = '';
-                modal.style.top = '';
-                
-                if (selectedPiece) {
-                    resolve({type: selectedPiece, color, position: { row: position.row, col: position.col } } as Piece);
-                }
-            };
-
-            buttons.forEach(btn => {
-                btn.addEventListener("click", handleClick);
-                const piece = {type: (btn.dataset.piece || '') as PieceType, color, position: { row: position.row, col: position.col }} as Piece;
-                btn.textContent = pieceToSymbol(piece);
-            });
+          const buttons = modal.querySelectorAll<HTMLButtonElement>(".piece-btn");
+      
+          const handleClick = (event: Event) => {
+            const target = event.target as HTMLButtonElement;
+            const selectedPiece = target.dataset.piece as PieceType;
+            buttons.forEach(btn => btn.removeEventListener("click", handleClick));
+            modal.close();
+      
+            modal.style.left = '';
+            modal.style.top = '';
+      
+            if (selectedPiece) {
+              resolve( selectedPiece );
+            }
+          };
+      
+          buttons.forEach(btn => {
+            btn.addEventListener("click", handleClick);
+            const piece = { type: (btn.dataset.piece || ''), color, position: { row: position.row, col: position.col } } as Piece;
+            btn.textContent = pieceToSymbol(piece);
+          });
         });
-    }
+      }
 }
 
 export default FunctionsFront;
