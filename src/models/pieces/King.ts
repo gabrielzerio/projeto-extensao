@@ -1,4 +1,4 @@
-import { Piece } from './Piece';
+import { Piece, MoveContext } from './Piece';
 import { Position, Board } from '../types';
 
 export class King extends Piece {
@@ -6,7 +6,7 @@ export class King extends Piece {
     super('king', color, position, false);
   }
 
-  protected isValidPattern(from: Position, to: Position, board: Board): boolean {
+  protected isValidPattern(from: Position, to: Position, board: Board, context: MoveContext = {}): boolean {
     const rowDiff = Math.abs(to.row - from.row);
     const colDiff = Math.abs(to.col - from.col);
 
@@ -23,8 +23,8 @@ export class King extends Piece {
     return false;
   }
 
-  isValidMove(from: Position, to: Position, board: Board): boolean {
-    if (!this.isValidPattern(from, to, board)) {
+  isValidMove(from: Position, to: Position, board: Board, context: MoveContext = {}): boolean {
+    if (!this.isValidPattern(from, to, board, context)) {
       return false;
     }
 
@@ -129,10 +129,10 @@ export class King extends Piece {
     }
   }
 
-  async move(from: Position, to: Position, board: Board): Promise<boolean> {
-    if (!this.isValidMove(from, to, board)) return false;
+  async move(from: Position, to: Position, board: Board, context: MoveContext = {}): Promise<boolean> {
+    if (!this.isValidMove(from, to, board, context)) return false;
 
-    const success = await super.move(from, to, board);
+    const success = await super.move(from, to, board, context);
     if (!success) return false;
 
     this.handleCastling(from, to, board);

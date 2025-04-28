@@ -1,6 +1,18 @@
 import { Position, Board, PieceType, PieceColor } from '../types';
 import { King } from './King';
 
+/**
+ * Contexto especial para movimentos, como en passant.
+ */
+export interface MoveContext {
+  enPassantTarget?: Position;
+  showPromotionDialog?: (color: string, position: Position) => Promise<{ type: string }>;
+  // outros campos especiais podem ser adicionados aqui
+}
+
+/**
+ * Classe abstrata que representa uma peça de xadrez.
+ */
 export abstract class Piece {
   constructor(
     public readonly type: PieceType,
@@ -9,12 +21,21 @@ export abstract class Piece {
     public hasMoved: boolean = false
   ) {}
 
-  isValidMove(from: Position, to: Position, board: Board): boolean {
-    return this.isValidPattern(from, to, board) && this.isMoveSafe(from, to, board);
+  /**
+   * Verifica se o movimento é válido para esta peça, considerando o contexto especial.
+   */
+  isValidMove(from: Position, to: Position, board: Board, context: MoveContext = {}): boolean {
+    return this.isValidPattern(from, to, board, context) && this.isMoveSafe(from, to, board);
   }
 
-  protected abstract isValidPattern(from: Position, to: Position, board: Board): boolean;
+  /**
+   * Verifica se o padrão de movimento é válido para esta peça.
+   */
+  protected abstract isValidPattern(from: Position, to: Position, board: Board, context?: MoveContext): boolean;
 
+  /**
+   * Verifica se o movimento não coloca o rei em xeque.
+   */
   protected isMoveSafe(from: Position, to: Position, board: Board): boolean {
     const targetPiece = board[to.row][to.col];
     if (targetPiece && targetPiece.color === this.color) {
@@ -27,6 +48,9 @@ export abstract class Piece {
     return this.simulateMove(from, to, board, () => !king.isInCheck(board));
   }
 
+  /**
+   * Verifica se o caminho entre duas posições está bloqueado.
+   */
   protected isPathBlocked(from: Position, to: Position, board: Board): boolean {
     const rowStep = Math.sign(to.row - from.row);
     const colStep = Math.sign(to.col - from.col);
@@ -44,8 +68,11 @@ export abstract class Piece {
     return false;
   }
 
-  async move(from: Position, to: Position, board: Board): Promise<boolean> {
-    if (!this.isValidMove(from, to, board)) return false;
+  /**
+   * Move a peça para uma nova posição, se o movimento for válido.
+   */
+  async move(from: Position, to: Position, board: Board, context: MoveContext = {}): Promise<boolean> {
+    if (!this.isValidMove(from, to, board, context)) return false;
 
     const originalPiece = board[to.row][to.col];
     const originalPosition = { ...this.position };
@@ -67,6 +94,9 @@ export abstract class Piece {
     return true;
   }
 
+  /**
+   * Simula um movimento e executa um callback para verificar o resultado.
+   */
   protected simulateMove(from: Position, to: Position, board: Board, callback: () => boolean): boolean {
     const originalPiece = board[to.row][to.col];
     const originalPosition = { ...this.position };
@@ -84,13 +114,16 @@ export abstract class Piece {
     return result;
   }
 
-  showPossibleMoves(board: Board): Position[] {
+  /**
+   * Retorna uma lista de posições possíveis para esta peça.
+   */
+  showPossibleMoves(board: Board, context: MoveContext = {}): Position[] {
     const possibleMoves: Position[] = [];
     
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
         const to = { row: r, col: c };
-        if (this.isValidMove(this.position, to, board)) {
+        if (this.isValidMove(this.position, to, board, context)) {
           possibleMoves.push(to);
         }
       }
@@ -99,11 +132,17 @@ export abstract class Piece {
     return possibleMoves;
   }
 
+  /**
+   * Verifica se esta peça está em xeque.
+   */
   isInCheck(board: Board): boolean {
     const king = this.findKing(this.color, board);
     return king ? king.isUnderAttack(board) : false;
   }
 
+  /**
+   * Encontra o rei do mesmo time no tabuleiro.
+   */
   protected findKing(color: PieceColor, board: Board): King | null {
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
@@ -116,6 +155,9 @@ export abstract class Piece {
     return null;
   }
 
+  /**
+   * Define o tipo da peça.
+   */
   protected setType(newType: PieceType): void {
     Object.defineProperty(this, 'type', {
       value: newType,

@@ -118,9 +118,13 @@ async function handleSquareClick(row: number, col: number): Promise<void> {
 async function movePiece(piece: Piece, from: Position, to: Position): Promise<boolean> {
   try {
     const originalPiece = board[to.row][to.col];
-    const success = piece instanceof Pawn 
-      ? await piece.move(from, to, board, enPassantTarget)
-      : await piece.move(from, to, board);
+    const context: any = { enPassantTarget };
+    if (piece instanceof Pawn) {
+      context.showPromotionDialog = async (color: string, position: Position) => {
+        return await frontFunctions.showPromotionDialog(color, position, pieceToSymbol);
+      };
+    }
+    const success = await piece.move(from, to, board, context);
 
     if (success) {
       if (originalPiece) {
@@ -166,16 +170,20 @@ function movePieceAnimation(to: Position, from: Position): void {
 
 function showPossibleMoves(piece: Piece, row: number, col: number): void {
   frontFunctions.removeHighlight();
-  
-  const possibleMoves = piece.showPossibleMoves(board);
+
+  const context: any = { enPassantTarget };
+  if (piece instanceof Pawn) {
+    context.showPromotionDialog = async (color: string, position: Position) => {
+      return await frontFunctions.showPromotionDialog(color, position, pieceToSymbol);
+    };
+  }
+  const possibleMoves = piece.showPossibleMoves(board, context);
   console.log("Movimentos possíveis:", possibleMoves);
-  
+
   possibleMoves.forEach(move => {
     const square = document.getElementById(`${move.row}-${move.col}`);
     if (square) {
-      // Verifica se há uma peça na casa de destino
       const targetPiece = board[move.row][move.col];
-      // Adiciona highlight vermelho apenas se houver uma peça inimiga
       square.classList.add(
         targetPiece && targetPiece.color !== piece.color ? 
         'capture-highlight' : 

@@ -1,4 +1,4 @@
-import { Piece } from './Piece';
+import { Piece, MoveContext } from './Piece';
 import { Position, Board } from '../types';
 
 export class Bishop extends Piece {
@@ -6,10 +6,9 @@ export class Bishop extends Piece {
     super('bishop', color, position);
   }
 
-  protected isValidPattern(from: Position, to: Position, board: Board): boolean {
+  protected isValidPattern(from: Position, to: Position, board: Board, context: MoveContext = {}): boolean {
     const rowDiff = Math.abs(from.row - to.row);
     const colDiff = Math.abs(from.col - to.col);
-
     return rowDiff === colDiff && !this.isPathBlocked(from, to, board);
   }
 }
