@@ -1,36 +1,38 @@
-import { Piece, PieceType, PieceColor, Position, Board, EnPassantTarget } from "./models/types";
-import { handleCastling, pawnPromotion, handleEnPassant, updateEnPassantTarget, revertMove } from "./gameActions";
+import { PieceType, PieceColor, Position, Board, EnPassantTarget } from "./models/types";
+import { PieceFactory } from './models/PieceFactory';
+import { Piece } from "./models/pieces/Piece";
+import { King } from "./models/pieces/King";
+import { Pawn } from "./models/pieces/Pawn";
 
 // Importações
 import FunctionsFront from "./utils/frontUtils.js";
-import PcsMvmt from "./utils/pieceMovement.js";
 import FunctionsTutorial from "./tutorial.js";
 
-const movimentos = new PcsMvmt();
 const frontFunctions = new FunctionsFront();
 const tutorialFunctions = new FunctionsTutorial;
 // Estado do jogo
 const board: Board = Array(8).fill(null).map(() => Array(8).fill(null));
 
 const pieces: Piece[] = [
-  { type: "rook", color: "black", position: { row: 0, col: 0 }, hasMoved: false },
-  { type: "knight", color: "black", position: { row: 0, col: 1 } },
-  { type: "bishop", color: "black", position: { row: 0, col: 2 } },
-  { type: "queen", color: "black", position: { row: 0, col: 3 } },
-  { type: "king", color: "black", position: { row: 0, col: 4 }, hasMoved: false },
-  { type: "bishop", color: "black", position: { row: 0, col: 5 } },
-  { type: "knight", color: "black", position: { row: 0, col: 6 } },
-  { type: "rook", color: "black", position: { row: 0, col: 7 }, hasMoved: false },
-  ...Array(8).fill(null).map((_, i) => ({ type: "pawn" as const, color: "black" as const, position: { row: 1, col: i } })),
-  ...Array(8).fill(null).map((_, i) => ({ type: "pawn" as const, color: "white" as const, position: { row: 6, col: i } })),
-  { type: "rook", color: "white", position: { row: 7, col: 0 }, hasMoved: false },
-  { type: "knight", color: "white", position: { row: 7, col: 1 } },
-  { type: "bishop", color: "white", position: { row: 7, col: 2 } },
-  { type: "queen", color: "white", position: { row: 7, col: 3 } },
-  { type: "king", color: "white", position: { row: 7, col: 4 }, hasMoved: false },
-  { type: "bishop", color: "white", position: { row: 7, col: 5 } },
-  { type: "knight", color: "white", position: { row: 7, col: 6 } },
-  { type: "rook", color: "white", position: { row: 7, col: 7 }, hasMoved: false },
+  // Peças pretas
+  PieceFactory.createPiece('rook', 'black', { row: 0, col: 0 }),
+  PieceFactory.createPiece('knight', 'black', { row: 0, col: 1 }),
+  PieceFactory.createPiece('bishop', 'black', { row: 0, col: 2 }),
+  PieceFactory.createPiece('queen', 'black', { row: 0, col: 3 }),
+  PieceFactory.createPiece('king', 'black', { row: 0, col: 4 }),
+  PieceFactory.createPiece('bishop', 'black', { row: 0, col: 5 }),
+  PieceFactory.createPiece('knight', 'black', { row: 0, col: 6 }),
+  PieceFactory.createPiece('rook', 'black', { row: 0, col: 7 }),
+  ...Array(8).fill(null).map((_, i) => PieceFactory.createPiece('pawn', 'black', { row: 1, col: i })),
+  ...Array(8).fill(null).map((_, i) => PieceFactory.createPiece('pawn', 'white', { row: 6, col: i })),
+  PieceFactory.createPiece('rook', 'white', { row: 7, col: 0 }),
+  PieceFactory.createPiece('knight', 'white', { row: 7, col: 1 }),
+  PieceFactory.createPiece('bishop', 'white', { row: 7, col: 2 }),
+  PieceFactory.createPiece('queen', 'white', { row: 7, col: 3 }),
+  PieceFactory.createPiece('king', 'white', { row: 7, col: 4 }),
+  PieceFactory.createPiece('bishop', 'white', { row: 7, col: 5 }),
+  PieceFactory.createPiece('knight', 'white', { row: 7, col: 6 }),
+  PieceFactory.createPiece('rook', 'white', { row: 7, col: 7 }),
 ];
 
 // Variáveis de estado
@@ -83,7 +85,7 @@ export function pieceToSymbol(piece: Piece): string {
     king: { white: "♔", black: "♚" },
     pawn: { white: "♙", black: "♟" },
   };
-  return symbols[piece.type][piece.color];
+  return symbols[piece.type as PieceType][piece.color as PieceColor];
 }
 
 async function handleSquareClick(row: number, col: number): Promise<void> {
@@ -114,59 +116,32 @@ async function handleSquareClick(row: number, col: number): Promise<void> {
 }
 
 async function movePiece(piece: Piece, from: Position, to: Position): Promise<boolean> {
-  if (!movimentos.isValidMove(piece, from, to, board, enPassantTarget)) {
-    const moveInfo = document.getElementById('move-info');
-    if (moveInfo) moveInfo.textContent = 'Movimento inválido. Tente novamente.';
-    return false;
-  }
-
-  await pawnPromotion(piece, to, pieceToSymbol);
-  const originalPiece = board[to.row][to.col];
-  const originalPosition = { ...piece.position };
-  
-  const isEnPassantMove = piece.type === "pawn" && enPassantTarget && to.row === enPassantTarget.row && to.col === enPassantTarget.col;
-  
-  let capturedPawn: Piece | null = null;
-  if (isEnPassantMove) {
-    const capturedPawnRow = piece.color === "white" ? to.row + 1 : to.row - 1;
-    capturedPawn = board[capturedPawnRow][to.col];
-  }
-
-  board[from.row][from.col] = null;
-  board[to.row][to.col] = piece;
-  piece.position = { row: to.row, col: to.col };
-
   try {
-    if (isEnPassantMove) {
-      handleEnPassant(piece, to, capturedPawn, board, pieces, removePiece);
+    const originalPiece = board[to.row][to.col];
+    const success = piece instanceof Pawn 
+      ? await piece.move(from, to, board, enPassantTarget)
+      : await piece.move(from, to, board);
+
+    if (success) {
+      if (originalPiece) {
+        removePiece(originalPiece);
+        const index = pieces.indexOf(originalPiece);
+        if (index > -1) pieces.splice(index, 1);
+      }
+      
+      if (piece instanceof Pawn) {
+        enPassantTarget = piece.getEnPassantTarget(from, to);
+      }
+      
+      movePieceAnimation(to, from);
+      return true;
     }
-
-    handleCastling(piece, from, to, board);
-    piece.hasMoved = true;
-
-    if (movimentos.isKingInCheck(piece.color, board)) {
-      revertMove(piece, from, to, originalPiece, originalPosition, capturedPawn, board);
-      const moveInfo = document.getElementById('move-info');
-      if (moveInfo) moveInfo.textContent = 'Movimento inválido: o rei ficaria em xeque.';
-      return false;
-    }
-
-    enPassantTarget = updateEnPassantTarget(piece, from, to);
   } catch (error) {
-    revertMove(piece, from, to, originalPiece, originalPosition, capturedPawn, board);
     const moveInfo = document.getElementById('move-info');
     if (moveInfo) moveInfo.textContent = error instanceof Error ? error.message : "An unknown error occurred.";
-    return false;
-  }
-
-  if (originalPiece) {
-    removePiece(originalPiece);
-    const index = pieces.indexOf(originalPiece);
-    if (index > -1) pieces.splice(index, 1);
   }
   
-  movePieceAnimation(to, from);
-  return true;
+  return false;
 }
 
 function movePieceAnimation(to: Position, from: Position): void {
@@ -191,55 +166,19 @@ function movePieceAnimation(to: Position, from: Position): void {
 
 function showPossibleMoves(piece: Piece, row: number, col: number): void {
   frontFunctions.removeHighlight();
-
-  if (piece.type === 'king' && !piece.hasMoved) {
-    const rookKingSide = board[row][7];
-    const rookQueenSide = board[row][0];
-    const position = { row, col };
-
-    if (rookKingSide && !rookKingSide.hasMoved && 
-        !board[row][5] && !board[row][6] && movimentos.isValidKingMove(piece, position, { row, col: col + 2 }, board)) {
-      const square = document.getElementById(`${row}-${col + 2}`);
-      if (square) square.classList.add('highlight');
+  
+  const possibleMoves = piece.showPossibleMoves(board);
+  
+  possibleMoves.forEach(move => {
+    const square = document.getElementById(`${move.row}-${move.col}`);
+    if (square) {
+      square.classList.add(
+        board[move.row][move.col]?.color !== piece.color ? 
+        'capture-highlight' : 
+        'highlight'
+      );
     }
-
-    if (rookQueenSide && !rookQueenSide.hasMoved && 
-        !board[row][1] && !board[row][2] && !board[row][3] && 
-        movimentos.isValidMove(piece, position, {row, col:col - 2}, board, enPassantTarget)) {
-      const square = document.getElementById(`${row}-${col - 2}`);
-      if (square) square.classList.add('highlight');
-    }
-  }
-
-  for (let r = 0; r < 8; r++) {
-    for (let c = 0; c < 8; c++) {
-      const to: Position = { row: r, col: c };
-      if (movimentos.isValidMove(piece, { row, col }, to, board, enPassantTarget)) {
-        const originalPiece = board[r][c];
-        const originalPosition = { ...piece.position };
-
-        board[row][col] = null;
-        board[r][c] = piece;
-        piece.position = to;
-        
-        const kingInCheck = movimentos.isKingInCheck(piece.color, board);
-
-        board[row][col] = piece;
-        board[r][c] = originalPiece;
-        piece.position = originalPosition;
-
-        if (!kingInCheck) {
-          const square = document.getElementById(`${r}-${c}`);
-          if (square) {
-            const to:Position = { row: r, col: c };
-            square.classList.add(
-              frontFunctions.canCaptureEnemyPiece(board, piece, to) ? 'capture-highlight' : 'highlight'
-            );
-          }
-        }
-      }
-    }
-  }
+  });
 }
 
 function toggleTurn(): void {
@@ -285,8 +224,9 @@ function positionToString(row: number, col: number): string {
 }
 
 function showAlerts(): void {
-  if (movimentos.isKingInCheck(currentColorTurn, board)) {
-    if (movimentos.isCheckmate(currentColorTurn, board, pieces)) {
+  const currentKing = pieces.find(p => p.type === 'king' && p.color === currentColorTurn) as King;
+  if (currentKing?.isInCheck(board)) {
+    if (King.isCheckmate(currentKing, pieces, board)) {
       frontFunctions.showEndGame(player1Name, player2Name, currentColorTurn);
     } else {
       alert(`${currentColorTurn === "white" ? "Rei branco" : "Rei preto"} está em xeque!`);

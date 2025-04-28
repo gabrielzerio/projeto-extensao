@@ -1,4 +1,5 @@
-import { Piece, Board, PieceType, PieceColor, Position } from '../models/types';
+import { Piece } from '../models/pieces/Piece';
+import { Board, PieceType, PieceColor, Position } from '../models/types';
 
 class FunctionsFront {
     removeHighlight(): void {
@@ -148,11 +149,7 @@ class FunctionsFront {
                 modal.style.top = '';
                 
                 if (selectedPiece) {
-                    resolve({ 
-                        type: selectedPiece, 
-                        color, 
-                        position: { row: position.row, col: position.col } 
-                    });
+                    resolve({type: selectedPiece, color, position: { row: position.row, col: position.col } } as Piece);
                 }
             };
 
