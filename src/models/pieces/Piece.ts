@@ -9,8 +9,24 @@ export abstract class Piece {
     public hasMoved: boolean = false
   ) {}
 
-  abstract isValidMove(from: Position, to: Position, board: Board): boolean;
-  
+  isValidMove(from: Position, to: Position, board: Board): boolean {
+    return this.isValidPattern(from, to, board) && this.isMoveSafe(from, to, board);
+  }
+
+  protected abstract isValidPattern(from: Position, to: Position, board: Board): boolean;
+
+  protected isMoveSafe(from: Position, to: Position, board: Board): boolean {
+    const targetPiece = board[to.row][to.col];
+    if (targetPiece && targetPiece.color === this.color) {
+      return false;
+    }
+
+    const king = this.findKing(this.color, board);
+    if (!king) return false;
+
+    return this.simulateMove(from, to, board, () => !king.isInCheck(board));
+  }
+
   protected isPathBlocked(from: Position, to: Position, board: Board): boolean {
     const rowStep = Math.sign(to.row - from.row);
     const colStep = Math.sign(to.col - from.col);
@@ -34,15 +50,12 @@ export abstract class Piece {
     const originalPiece = board[to.row][to.col];
     const originalPosition = { ...this.position };
 
-    // Faz o movimento temporariamente
     board[from.row][from.col] = null;
     board[to.row][to.col] = this;
     this.position = { row: to.row, col: to.col };
 
-    // Verifica se o rei da mesma cor está em xeque após o movimento
     const king = this.findKing(this.color, board);
     if (king?.isInCheck(board)) {
-      // Desfaz o movimento se deixar o rei em xeque
       board[from.row][from.col] = this;
       board[to.row][to.col] = originalPiece;
       this.position = originalPosition;
@@ -58,33 +71,17 @@ export abstract class Piece {
     const originalPiece = board[to.row][to.col];
     const originalPosition = { ...this.position };
 
-    // Faz o movimento temporariamente
     board[from.row][from.col] = null;
     board[to.row][to.col] = this;
     this.position = to;
 
     const result = callback();
 
-    // Desfaz o movimento
     board[from.row][from.col] = this;
     board[to.row][to.col] = originalPiece;
     this.position = originalPosition;
 
     return result;
-  }
-
-  protected isMoveValid(from: Position, to: Position, board: Board): boolean {
-    // Verifica se pode mover para a casa (vazia ou captura)
-    const targetPiece = board[to.row][to.col];
-    if (targetPiece && targetPiece.color === this.color) {
-      return false;
-    }
-
-    // Verifica se o movimento deixaria o rei em xeque
-    const king = this.findKing(this.color, board);
-    if (!king) return false;
-
-    return this.simulateMove(from, to, board, () => !king.isInCheck(board));
   }
 
   showPossibleMoves(board: Board): Position[] {
@@ -93,8 +90,7 @@ export abstract class Piece {
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
         const to = { row: r, col: c };
-        if (this.isValidMove(this.position, to, board) && 
-            this.isMoveValid(this.position, to, board)) {
+        if (this.isValidMove(this.position, to, board)) {
           possibleMoves.push(to);
         }
       }

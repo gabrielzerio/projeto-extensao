@@ -6,10 +6,6 @@ export class Bishop extends Piece {
     super('bishop', color, position);
   }
 
-  isValidMove(from: Position, to: Position, board: Board): boolean {
-    return this.isValidPattern(from, to, board) && this.isMoveValid(from, to, board);
-  }
-
   protected isValidPattern(from: Position, to: Position, board: Board): boolean {
     const rowDiff = Math.abs(from.row - to.row);
     const colDiff = Math.abs(from.col - to.col);

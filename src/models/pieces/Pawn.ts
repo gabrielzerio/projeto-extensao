@@ -8,7 +8,7 @@ export class Pawn extends Piece {
     super('pawn', color, position);
   }
 
-  isValidMove(from: Position, to: Position, board: Board, enPassantTarget?: EnPassantTarget): boolean {
+  protected isValidPattern(from: Position, to: Position, board: Board, enPassantTarget?: EnPassantTarget): boolean {
     const direction = this.color === "white" ? -1 : 1;
     const startRow = this.color === "white" ? 6 : 1;
 
@@ -25,20 +25,21 @@ export class Pawn extends Piece {
 
     // Captura diagonal (incluindo en passant)
     if (Math.abs(from.col - to.col) === 1 && to.row === from.row + direction) {
-      // Verifica se há uma peça inimiga para capturar
       const targetPiece = board[to.row][to.col];
       if (targetPiece && targetPiece.color !== this.color) return true;
 
-      // Verifica captura en passant
       if (enPassantTarget &&
           to.row === enPassantTarget.row &&
           to.col === enPassantTarget.col) {
         return true;
       }
-      return false; // Se não houver peça para capturar, movimento é inválido
     }
 
     return false;
+  }
+
+  isValidMove(from: Position, to: Position, board: Board, enPassantTarget?: EnPassantTarget): boolean {
+    return this.isValidPattern(from, to, board, enPassantTarget) && this.isMoveSafe(from, to, board);
   }
 
   async promote(position: Position, pieceToSymbol: (piece: Piece) => string): Promise<void> {

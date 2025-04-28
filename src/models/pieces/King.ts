@@ -6,13 +6,13 @@ export class King extends Piece {
     super('king', color, position, false);
   }
 
-  isValidMove(from: Position, to: Position, board: Board): boolean {
+  protected isValidPattern(from: Position, to: Position, board: Board): boolean {
     const rowDiff = Math.abs(to.row - from.row);
     const colDiff = Math.abs(to.col - from.col);
 
     // Movimento normal do rei
     if (rowDiff <= 1 && colDiff <= 1) {
-      return this.isMoveValid(from, to, board);
+      return true;
     }
 
     // Roque
@@ -21,6 +21,16 @@ export class King extends Piece {
     }
 
     return false;
+  }
+
+  isValidMove(from: Position, to: Position, board: Board): boolean {
+    if (!this.isValidPattern(from, to, board)) {
+      return false;
+    }
+
+    // Para o rei, precisamos verificar se a casa de destino não está sob ataque
+    return this.isMoveSafe(from, to, board) && 
+           !this.isSquareUnderAttack(to.row, to.col, this.color, board);
   }
 
   private isCastlingValid(from: Position, to: Position, board: Board): boolean {
