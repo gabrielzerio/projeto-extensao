@@ -50,7 +50,7 @@ export abstract class Piece {
     }
 
     const king = this.findKing(this.color, board);
-    if (!king) return false;
+    if (!king) return true;
 
     return this.simulateMove(from, to, board, () => !king.isInCheck(board));
   }
