@@ -1,8 +1,8 @@
 import { Piece, MoveContext } from './Piece';
-import { Position, Board } from '../types';
+import { Position, Board, PieceColor } from '../types';
 
 export class King extends Piece {
-  constructor(color: 'white' | 'black', position: Position) {
+  constructor(color: PieceColor, position: Position) {
     super('king', color, position, false);
   }
 
@@ -62,13 +62,15 @@ export class King extends Piece {
     return this.isSquareUnderAttack(this.position.row, this.position.col, this.color, board);
   }
 
-  private isSquareUnderAttack(row: number, col: number, kingColor: string, board: Board): boolean {
+  private isSquareUnderAttack(row: number, col: number, kingColor: PieceColor, board: Board): boolean {
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
         const piece = board[r][c];
         if (piece && piece.color !== kingColor) {
-          if (piece.isValidMove({ row: r, col: c }, { row, col }, board)) {
-            return true;
+          if (typeof piece.canAttackSquare === 'function') {
+            if (piece.canAttackSquare({ row: r, col: c }, { row, col }, board)) {
+              return true;
+            }
           }
         }
       }

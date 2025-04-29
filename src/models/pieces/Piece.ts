@@ -34,6 +34,13 @@ export abstract class Piece {
   protected abstract isValidPattern(from: Position, to: Position, board: Board, context?: MoveContext): boolean;
 
   /**
+   * Verifica se esta peça pode atacar uma casa (padrão de ataque, não necessariamente movimento legal).
+   */
+  public canAttackSquare(from: Position, to: Position, board: Board): boolean {
+    return this.isValidPattern(from, to, board);
+  }
+
+  /**
    * Verifica se o movimento não coloca o rei em xeque.
    */
   protected isMoveSafe(from: Position, to: Position, board: Board): boolean {
