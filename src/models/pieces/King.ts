@@ -200,10 +200,6 @@ export class King extends Piece {
     });
   }
 
-  isUnderAttack(board: Board): boolean {
-    return this.isSquareUnderAttack(this.position.row, this.position.col, this.color, board);
-  }
-
   showPossibleMoves(board: Board): Position[] {
     const normalMoves = super.showPossibleMoves(board);
     

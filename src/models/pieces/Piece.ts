@@ -144,7 +144,7 @@ export abstract class Piece {
    */
   isInCheck(board: Board): boolean {
     const king = this.findKing(this.color, board);
-    return king ? king.isUnderAttack(board) : false;
+    return king ? king.isInCheck(board) : false;
   }
 
   /**
