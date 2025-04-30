@@ -40,6 +40,15 @@ export class Pawn extends Piece {
     return false;
   }
 
+  canAttackSquare(from: Position, to: Position, board: Board): boolean {
+    const direction = this.color === "white" ? -1 : 1;
+    // Peão ataca apenas na diagonal, independente de peça estar lá
+    return (
+      Math.abs(from.col - to.col) === 1 &&
+      to.row === from.row + direction
+    );
+  }
+
   handleEnPassant(to: Position, capturedPawn: Piece | null, board: Board): void {
     if (!capturedPawn) return;
     const capturedPawnRow = this.color === "white" ? to.row + 1 : to.row - 1;

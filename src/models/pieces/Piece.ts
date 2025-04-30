@@ -34,6 +34,13 @@ export abstract class Piece {
   protected abstract isValidPattern(from: Position, to: Position, board: Board, context?: MoveContext): boolean;
 
   /**
+   * Verifica se esta peça pode atacar uma casa (padrão de ataque, não necessariamente movimento legal).
+   */
+  public canAttackSquare(from: Position, to: Position, board: Board): boolean {
+    return this.isValidPattern(from, to, board);
+  }
+
+  /**
    * Verifica se o movimento não coloca o rei em xeque.
    */
   protected isMoveSafe(from: Position, to: Position, board: Board): boolean {
@@ -43,7 +50,7 @@ export abstract class Piece {
     }
 
     const king = this.findKing(this.color, board);
-    if (!king) return false;
+    if (!king) return true;
 
     return this.simulateMove(from, to, board, () => !king.isInCheck(board));
   }
@@ -137,7 +144,7 @@ export abstract class Piece {
    */
   isInCheck(board: Board): boolean {
     const king = this.findKing(this.color, board);
-    return king ? king.isUnderAttack(board) : false;
+    return king ? king.isInCheck(board) : false;
   }
 
   /**

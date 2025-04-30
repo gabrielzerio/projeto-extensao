@@ -15,5 +15,6 @@ export async function promotePawn(
     }
     const newPiece = PieceFactory.createPiece(promotedPiece, pawn.color, position);
     board[position.row][position.col] = newPiece;
+    // Não é necessário remover explicitamente o peão, pois ele é sobrescrito
   }
 }
