@@ -249,6 +249,7 @@ function showAlerts(): void {
 toggleTurn();
 
 window.onload = async () => {
+  createBoard();
   const urlParams = new URLSearchParams(window.location.search);
   const mode = urlParams.get('mode');
   let opcao;
@@ -261,12 +262,26 @@ window.onload = async () => {
        opcao = await frontFunctions.showTutorial(); 
        if(opcao === 'knight'){
           const whitePawnPositions = Array.from({ length: 8 }, (_, col) => ({ row: 6, col}));
-          tutorialFunctions.tutorialKnight(opcao, [{row: 1, col: 6},], [{row: 7, col: 1},], whitePawnPositions, pieces, board);
+          
        }
        if(opcao === 'pawn'){
-          tutorialFunctions.movePieceTo(opcao, [{row: 1, col: 6},], [{row: 6, col: 4},], pieces, board);           
+          tutorialFunctions.tutorialPawn(opcao, {row: 1, col: 6}, {row: 6, col: 4},  board);           
        }
- 
+       if(opcao === 'bishop'){
+          tutorialFunctions.tutorialBishop(opcao, {row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
+       }
+        if(opcao === 'rook'){
+            tutorialFunctions.tutorialRook(opcao, {row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
+        }
+        if(opcao === 'knight'){
+            tutorialFunctions.tutorialKnight(opcao, {row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
+        }
+        if(opcao === 'queen'){
+            tutorialFunctions.tutorialQueen(opcao, {row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
+        }
+        if(opcao === 'king'){
+            tutorialFunctions.tutorialKing(opcao, {row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
+        }
        createBoard();
     }
 };

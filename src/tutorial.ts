@@ -1,58 +1,107 @@
 import {Position, Board } from './models/types';
 import { Piece } from './models/pieces/Piece';
+import {PieceFactory} from './models/PieceFactory';
+
 
 class FunctionsTutorial {
-    movePieceTo(type: string, blackPositions: Position[], whitePositions: Position[], pieces: Piece[], board: Board): void {
-        // Coloca as peças brancas do tipo especificado nas posições dadas
-        if (Array.isArray(whitePositions)) {
-            whitePositions.forEach(pos => {
-                const whitePiece = pieces.find(p => p.type === type && p.color === 'white');
-                if (whitePiece) {
-                    board[pos.row][pos.col] = { ...whitePiece }; // Clona a peça
-                }
-            });
+    tutorialPawn(type: string, blackPositions: Position, whitePositions: Position, board: Board): void {
+        if (whitePositions) {
+            const pawn = PieceFactory.createPiece('pawn', 'white', whitePositions);
+            board[whitePositions.row][whitePositions.col] = pawn;
         }
-        // Coloca peões pretos nas posições dadas
-        if (Array.isArray(blackPositions)) {
-            blackPositions.forEach(pos => {
-                const blackPawn = pieces.find(p => p.type === 'pawn' && p.color === 'black');
-                if (blackPawn) {
-                    board[pos.row][pos.col] = { ...blackPawn }; // Clona a peça
-                }
-            });
+
+        if (blackPositions) {
+            const pawn = PieceFactory.createPiece('pawn', 'black', blackPositions);
+            board[blackPositions.row][blackPositions.col] = pawn;
         }
     }
 
-    tutorialKnight(type: string, blackPositions: Position[], whitePositions: Position[], whitePawns: Position[], pieces: Piece[], board: Board): void {
-        if (Array.isArray(whitePositions)) {
-            whitePositions.forEach(pos => {
-                const whiteKnight = pieces.find(p => p.type === type && p.color === 'white');
-                if (whiteKnight) {
-                    board[pos.row][pos.col] = { ...whiteKnight }; // Clona a peça
-                }
-            });
-        }
-
-        // Coloca peões brancos nas posições dadas
-        if (Array.isArray(whitePawns)) {
-            whitePawns.forEach(pos => {
-                const whitePawn = pieces.find(p => p.type === 'pawn' && p.color === 'white');
-                if (whitePawn) {
-                    board[pos.row][pos.col] = { ...whitePawn }; // Clona a peça
-                }
-            });
-        }
+    tutorialKnight(type: string, blackPositions: Position, whitePositions: Position, whitePawns: Position, board: Board): void {
+        if (whitePositions) {
+                const whiteKnight = PieceFactory.createPiece('knight', 'white', whitePositions);
+                board[whitePositions.row][whitePositions.col] = whiteKnight;               
+            }
         
-        // Coloca peões pretos nas posições dadas
-        if (Array.isArray(blackPositions)) {
-            blackPositions.forEach(pos => {
-                const blackPawn = pieces.find(p => p.type === 'pawn' && p.color === 'black');
-                if (blackPawn) {
-                    board[pos.row][pos.col] = { ...blackPawn }; // Clona a peça
-                }
-            });
+
+        if (whitePawns) {
+                const whitePawn = PieceFactory.createPiece('pawn', 'white', whitePawns);
+                    board[whitePawns.row][whitePawns.col] = whitePawn; 
+            }
+        
+
+        if (blackPositions) {
+            const blackPawn = PieceFactory.createPiece('pawn', 'black', blackPositions);
+            board[blackPositions.row][blackPositions.col] = blackPawn; 
         }
     }
-}
 
+    tutorialBishop(type: string, blackPositions: Position, whitePositions: Position, whiteKing: Position, board: Board): void {
+        if (whitePositions) {
+            const whiteBishop = PieceFactory.createPiece('bishop', 'white', whitePositions);
+            board[whitePositions.row][whitePositions.col] = whiteBishop;               
+        }
+
+        if (blackPositions) {
+            const blackPawn = PieceFactory.createPiece('pawn', 'black', blackPositions);
+            board[blackPositions.row][blackPositions.col] = blackPawn; 
+        }
+
+        if (whiteKing) {
+            const king = PieceFactory.createPiece('king', 'white', whiteKing);
+            board[whiteKing.row][whiteKing.col] = king; 
+        }
+    }
+
+    tutorialRook(type: string, blackPositions: Position, whitePositions: Position, whitePawns: Position, board: Board): void {
+        if (whitePositions) {
+            const whiteRook = PieceFactory.createPiece('rook', 'white', whitePositions);
+            board[whitePositions.row][whitePositions.col] = whiteRook;               
+        }
+
+        if (whitePawns) {
+            const whitePawn = PieceFactory.createPiece('pawn', 'white', whitePawns);
+            board[whitePawns.row][whitePawns.col] = whitePawn; 
+        }
+
+        if (blackPositions) {
+            const blackPawn = PieceFactory.createPiece('pawn', 'black', blackPositions);
+            board[blackPositions.row][blackPositions.col] = blackPawn; 
+        }
+    }
+
+    tutorialQueen(type: string, blackPositions: Position, whitePositions: Position, whitePawns: Position, board: Board): void {
+        if (whitePositions) {
+            const whiteQueen = PieceFactory.createPiece('queen', 'white', whitePositions);
+            board[whitePositions.row][whitePositions.col] = whiteQueen;               
+        }
+
+        if (whitePawns) {
+            const whitePawn = PieceFactory.createPiece('pawn', 'white', whitePawns);
+            board[whitePawns.row][whitePawns.col] = whitePawn; 
+        }
+
+        if (blackPositions) {
+            const blackPawn = PieceFactory.createPiece('pawn', 'black', blackPositions);
+            board[blackPositions.row][blackPositions.col] = blackPawn; 
+        }
+    }
+
+    tutorialKing(type: string, blackPositions: Position, whitePositions: Position, whitePawns: Position, board: Board): void {
+        if (whitePositions) {
+            const whiteKing = PieceFactory.createPiece('king', 'white', whitePositions);
+            board[whitePositions.row][whitePositions.col] = whiteKing;               
+        }
+
+        if (whitePawns) {
+            const whitePawn = PieceFactory.createPiece('pawn', 'white', whitePawns);
+            board[whitePawns.row][whitePawns.col] = whitePawn; 
+        }
+
+        if (blackPositions) {
+            const blackPawn = PieceFactory.createPiece('pawn', 'black', blackPositions);
+            board[blackPositions.row][blackPositions.col] = blackPawn; 
+        }
+    }
+
+}
 export default FunctionsTutorial;
