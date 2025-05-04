@@ -268,7 +268,15 @@ window.onload = async () => {
           tutorialFunctions.tutorialPawn(opcao, {row: 1, col: 6}, {row: 6, col: 4},  board);           
        }
        if(opcao === 'bishop'){
-          tutorialFunctions.tutorialBishop(opcao, {row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
+          tutorialFunctions.tutorialBishop(opcao, {row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4},
+            {row: 0, col: 5}, //p1
+            {row: 1, col: 4}, //p2
+            {row: 2, col: 3}, //p3
+            {row: 0, col: 6}, //p4
+            {row: 1, col: 7}, //p5
+            {row: 1, col: 6}, //p6  
+            {row: 2, col: 5}, //p7
+             board); 
        }
         if(opcao === 'rook'){
             tutorialFunctions.tutorialRook(opcao, {row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
