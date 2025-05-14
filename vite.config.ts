@@ -14,6 +14,7 @@ export default defineConfig({
         // Corrige caminhos relativos
         main: resolve(__dirname, 'index.html'),
         game: resolve(__dirname, 'src/pages/game.html'),
+        reactTest: resolve(__dirname, 'reactTest.html'),
         // ...outras páginas
       }
     },

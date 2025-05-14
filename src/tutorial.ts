@@ -1,10 +1,12 @@
 import {Position, Board } from './models/types';
-import { Piece } from './models/pieces/Piece';
 import {PieceFactory} from './models/PieceFactory';
-
+import { mostrarPopup } from './popUp/popupUtils';
 
 class FunctionsTutorial {
     tutorialPawn(type: string, blackPositions: Position, whitePositions: Position, board: Board): void {
+
+  
+        
         if (whitePositions) {
             const pawn = PieceFactory.createPiece('pawn', 'white', whitePositions);
             board[whitePositions.row][whitePositions.col] = pawn;
@@ -14,6 +16,9 @@ class FunctionsTutorial {
             const pawn = PieceFactory.createPiece('pawn', 'black', blackPositions);
             board[blackPositions.row][blackPositions.col] = pawn;
         }
+
+        mostrarPopup();
+
     }
 
     tutorialKnight(type: string, blackPositions: Position, whitePositions: Position, whitePawns: Position, board: Board): void {

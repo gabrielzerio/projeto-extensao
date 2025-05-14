@@ -194,10 +194,16 @@ function showPossibleMoves(piece: Piece, row: number, col: number): void {
 }
 
 function toggleTurn(): void {
-  currentColorTurn = currentColorTurn === "white" ? "black" : "white";
-  const turnInfo = document.getElementById("turn-info");
-  if (turnInfo) {
-    turnInfo.textContent = `Turno: ${currentColorTurn === "white" ? "Jogador Branco" : "Jogador Preto"}`;
+  const urlParams = new URLSearchParams(window.location.search);
+  const mode = urlParams.get('mode');
+  if(mode === 'default'){
+    currentColorTurn = currentColorTurn === "white" ? "black" : "white";
+    const turnInfo = document.getElementById("turn-info");
+    if (turnInfo) {
+      turnInfo.textContent = `Turno: ${currentColorTurn === "white" ? "Jogador Branco" : "Jogador Preto"}`;
+    }
+  }else if(mode === 'tutorial'){
+    currentColorTurn = "white";
   }
 }
 
