@@ -1,12 +1,9 @@
 import {Position, Board } from './models/types';
 import {PieceFactory} from './models/PieceFactory';
-import { mostrarPopup } from './popUp/popupUtils';
 
 class FunctionsTutorial {
-    tutorialPawn(type: string, blackPositions: Position, whitePositions: Position, board: Board): void {
-
-  
-        
+   
+    tutorialPawn(blackPositions: Position, whitePositions: Position, board: Board): void {
         if (whitePositions) {
             const pawn = PieceFactory.createPiece('pawn', 'white', whitePositions);
             board[whitePositions.row][whitePositions.col] = pawn;
@@ -17,11 +14,10 @@ class FunctionsTutorial {
             board[blackPositions.row][blackPositions.col] = pawn;
         }
 
-        mostrarPopup();
-
+       
     }
 
-    tutorialKnight(type: string, blackPositions: Position, whitePositions: Position, whitePawns: Position, board: Board): void {
+    tutorialKnight(blackPositions: Position, whitePositions: Position, whitePawns: Position, board: Board): void {
         if (whitePositions) {
                 const whiteKnight = PieceFactory.createPiece('knight', 'white', whitePositions);
                 board[whitePositions.row][whitePositions.col] = whiteKnight;               
@@ -40,7 +36,7 @@ class FunctionsTutorial {
         }
     }
 
-    tutorialBishop(type: string, blackPositions: Position, whitePositions: Position, whiteKing: Position,
+    tutorialBishop(blackPositions: Position, whitePositions: Position, whiteKing: Position,
         p1: Position, p2: Position, p3: Position, p4: Position, p5: Position, p6: Position, p7: Position, 
         board: Board): void {
         if (whitePositions) {
@@ -85,9 +81,10 @@ class FunctionsTutorial {
             const pawn7 = PieceFactory.createPiece('pawn', 'black', p7);
             board[p7.row][p7.col] = pawn7;
         }
+        
     }
 
-    tutorialRook(type: string, blackPositions: Position, whitePositions: Position, whitePawns: Position, board: Board): void {
+    tutorialRook(blackPositions: Position, whitePositions: Position, whitePawns: Position, board: Board): void {
         if (whitePositions) {
             const whiteRook = PieceFactory.createPiece('rook', 'white', whitePositions);
             board[whitePositions.row][whitePositions.col] = whiteRook;               
@@ -104,7 +101,7 @@ class FunctionsTutorial {
         }
     }
 
-    tutorialQueen(type: string, blackPositions: Position, whitePositions: Position, whitePawns: Position, board: Board): void {
+    tutorialQueen(blackPositions: Position, whitePositions: Position, whitePawns: Position, board: Board): void {
         if (whitePositions) {
             const whiteQueen = PieceFactory.createPiece('queen', 'white', whitePositions);
             board[whitePositions.row][whitePositions.col] = whiteQueen;               
@@ -121,7 +118,7 @@ class FunctionsTutorial {
         }
     }
 
-    tutorialKing(type: string, blackPositions: Position, whitePositions: Position, whitePawns: Position, board: Board): void {
+    tutorialKing(blackPositions: Position, whitePositions: Position, whitePawns: Position, board: Board): void {
         if (whitePositions) {
             const whiteKing = PieceFactory.createPiece('king', 'white', whitePositions);
             board[whitePositions.row][whitePositions.col] = whiteKing;               
@@ -137,6 +134,5 @@ class FunctionsTutorial {
             board[blackPositions.row][blackPositions.col] = blackPawn; 
         }
     }
-
 }
 export default FunctionsTutorial;

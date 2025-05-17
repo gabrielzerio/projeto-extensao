@@ -1,10 +1,9 @@
-import React from 'react';
 import ReactDOMClient from 'react-dom/client';
 import Popup from './Popup';
 
 let popupRoot: HTMLDivElement | null = null;
 
-export function mostrarPopup() {
+export function mostrarPopup(mensagem: string) {
   if (popupRoot) return;
 
   popupRoot = document.createElement('div');
@@ -13,10 +12,10 @@ export function mostrarPopup() {
   const root = ReactDOMClient.createRoot(popupRoot);
 
   const fecharPopup = () => {
-    root.unmount(); // ✅ correto para React 18+
+    root.unmount(); 
     document.body.removeChild(popupRoot!);
     popupRoot = null;
   };
 
-  root.render(<Popup visible={true} onClose={fecharPopup} />);
+  root.render(<Popup visible={true} onClose={fecharPopup} mensagem={mensagem} />);
 }

@@ -7,6 +7,8 @@ import { Pawn } from "./models/pieces/Pawn";
 // Importações
 import FunctionsFront from "./utils/frontUtils.js";
 import FunctionsTutorial from "./tutorial.js";
+import TutorialUtils from './utils/tutorialmsgUtils';
+import { mostrarPopup } from './popUp/popupUtils';
 
 const frontFunctions = new FunctionsFront();
 const tutorialFunctions = new FunctionsTutorial;
@@ -259,22 +261,26 @@ window.onload = async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const mode = urlParams.get('mode');
   let opcao;
+  
     if(mode==='default'){
       frontFunctions.showPlayersName(player1Name, player2Name);
       initializeBoard();
       createBoard();
     }
     else if(mode === 'tutorial'){
-       opcao = await frontFunctions.showTutorial(); 
+      
+      opcao = await frontFunctions.showTutorial();
+      const tutorialUtils = new TutorialUtils();
+      const mensagem = tutorialUtils.mensagemTutorial(opcao); 
+      mostrarPopup(mensagem);
        if(opcao === 'knight'){
-          const whitePawnPositions = Array.from({ length: 8 }, (_, col) => ({ row: 6, col}));
-          
+          tutorialFunctions.tutorialKnight({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board);
        }
        if(opcao === 'pawn'){
-          tutorialFunctions.tutorialPawn(opcao, {row: 1, col: 6}, {row: 6, col: 4},  board);           
+          tutorialFunctions.tutorialPawn({row: 1, col: 6}, {row: 6, col: 4},  board);           
        }
        if(opcao === 'bishop'){
-          tutorialFunctions.tutorialBishop(opcao, {row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4},
+          tutorialFunctions.tutorialBishop({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4},
             {row: 0, col: 5}, //p1
             {row: 1, col: 4}, //p2
             {row: 2, col: 3}, //p3
@@ -285,16 +291,16 @@ window.onload = async () => {
              board); 
        }
         if(opcao === 'rook'){
-            tutorialFunctions.tutorialRook(opcao, {row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
+            tutorialFunctions.tutorialRook({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
         }
         if(opcao === 'knight'){
-            tutorialFunctions.tutorialKnight(opcao, {row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
+            tutorialFunctions.tutorialKnight({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
         }
         if(opcao === 'queen'){
-            tutorialFunctions.tutorialQueen(opcao, {row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
+            tutorialFunctions.tutorialQueen({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
         }
         if(opcao === 'king'){
-            tutorialFunctions.tutorialKing(opcao, {row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
+            tutorialFunctions.tutorialKing({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
         }
        createBoard();
     }

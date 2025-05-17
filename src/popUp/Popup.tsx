@@ -1,11 +1,12 @@
-import React from "react";
+import React from "react";  
 
 interface PopupProps {
   onClose: () => void;
   visible: boolean;
+  mensagem: string; 
 }
 
-const Popup: React.FC<PopupProps> = ({ visible, onClose }) => {
+const Popup: React.FC<PopupProps> = ({ visible, onClose, mensagem }) => {
   if (!visible) return null;
 
   return (
@@ -48,9 +49,9 @@ const Popup: React.FC<PopupProps> = ({ visible, onClose }) => {
             borderRadius: "17px",
           }}
         >
-          Nosso Rei está em cheque, ajude ele!
+          {mensagem}
         </p>
-
+          
         <button
           id="voltar"
           style={{
@@ -78,6 +79,7 @@ const Popup: React.FC<PopupProps> = ({ visible, onClose }) => {
             backgroundColor: "transparent",
             border: "none",
           }}
+           onClick={onClose}
         >
           <img
             src="/imgs/setadireita.png"
