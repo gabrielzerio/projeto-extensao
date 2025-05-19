@@ -1,29 +1,65 @@
 import { Position, Board } from './models/types';
 import { PieceFactory } from './models/PieceFactory';
+import { Piece } from './models/pieces';
 
 class FunctionsTutorial {
-    tutorialPawn(blackPositions: Position, whitePositions: Position, board: Board): void {
+    tutorialPawn(
+        blackPositions: Position,
+        whitePositions: Position,
+        blackKing: Position,
+        whiteKing: Position,
+        board: Board
+    ): void {
         const pawnW = PieceFactory.createPiece('pawn', 'white', whitePositions);
         board[whitePositions.row][whitePositions.col] = pawnW;
 
         const pawnB = PieceFactory.createPiece('pawn', 'black', blackPositions);
         board[blackPositions.row][blackPositions.col] = pawnB;
+
+        const king = PieceFactory.createPiece('king', 'black', blackKing);
+        board[blackKing.row][blackKing.col] = king;
+
+        const kingW = PieceFactory.createPiece('king', 'white', whiteKing);
+        board[whiteKing.row][whiteKing.col] = kingW;
     }
 
     tutorialKnight(
-        blackPositions: Position,
         whitePositions: Position,
-        whitePawns: Position,
+        kingW: Position,
+        KingB: Position,
+        p1: Position,
+        p2: Position,
+        p3: Position,
+        p4: Position,
+        p5: Position,
+        p6: Position,
         board: Board
     ): void {
         const whiteKnight = PieceFactory.createPiece('knight', 'white', whitePositions);
         board[whitePositions.row][whitePositions.col] = whiteKnight;
 
-        const whitePawn = PieceFactory.createPiece('pawn', 'white', whitePawns);
-        board[whitePawns.row][whitePawns.col] = whitePawn;
+        const king = PieceFactory.createPiece('king', 'white', kingW);
+        board[kingW.row][kingW.col] = king;
+        const kingB = PieceFactory.createPiece('king', 'black', KingB);
+        board[KingB.row][KingB.col] = kingB;
 
-        const blackPawn = PieceFactory.createPiece('pawn', 'black', blackPositions);
-        board[blackPositions.row][blackPositions.col] = blackPawn;
+        const pawn1 = PieceFactory.createPiece('pawn', 'black', p1);
+        board[p1.row][p1.col] = pawn1;
+
+        const pawn2 = PieceFactory.createPiece('pawn', 'black', p2);
+        board[p2.row][p2.col] = pawn2;
+
+        const pawn3 = PieceFactory.createPiece('pawn', 'black', p3);
+        board[p3.row][p3.col] = pawn3;
+
+        const pawn4 = PieceFactory.createPiece('pawn', 'black', p4);
+        board[p4.row][p4.col] = pawn4;
+
+        const pawn5 = PieceFactory.createPiece('pawn', 'black', p5);
+        board[p5.row][p5.col] = pawn5;
+
+        const bishop = PieceFactory.createPiece('bishop', 'black', p6);
+        board[p6.row][p6.col] = bishop;
     }
 
     tutorialBishop(
@@ -74,6 +110,8 @@ class FunctionsTutorial {
         blackPositions: Position,
         whitePositions: Position,
         whitePawns: Position,
+        p1: Position,
+        p2: Position,
         board: Board
     ): void {
         const whiteRook = PieceFactory.createPiece('rook', 'white', whitePositions);
@@ -84,6 +122,12 @@ class FunctionsTutorial {
 
         const blackPawn = PieceFactory.createPiece('pawn', 'black', blackPositions);
         board[blackPositions.row][blackPositions.col] = blackPawn;
+
+        const pawn1 = PieceFactory.createPiece('pawn', 'black', p1);
+        board[p1.row][p1.col] = pawn1;
+
+        const pawn2 = PieceFactory.createPiece('pawn', 'black', p2);
+        board[p2.row][p2.col] = pawn2;
     }
 
     tutorialQueen(

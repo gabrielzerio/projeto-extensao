@@ -273,11 +273,9 @@ window.onload = async () => {
       const tutorialUtils = new TutorialUtils();
       const mensagem = tutorialUtils.mensagemTutorial(opcao); 
       mostrarPopup(mensagem);
-       if(opcao === 'knight'){
-          tutorialFunctions.tutorialKnight({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board);
-       }
        if(opcao === 'pawn'){
-          tutorialFunctions.tutorialPawn({row: 1, col: 6}, {row: 6, col: 4},  board);           
+          tutorialFunctions.tutorialPawn({row: 1, col: 4}, {row: 6, col: 3}, {row: 1, col: 2},{row: 7, col: 3}, board);
+          console.log(board);          
        }
        if(opcao === 'bishop'){
           tutorialFunctions.tutorialBishop({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4},
@@ -291,13 +289,25 @@ window.onload = async () => {
              board); 
        }
         if(opcao === 'rook'){
-            tutorialFunctions.tutorialRook({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
+            tutorialFunctions.tutorialRook({row: 0, col: 4}, {row: 4, col: 4}, {row: 7, col: 4}, 
+              {row: 4, col: 0}, //p1
+              {row: 4, col: 7}, //p2
+              board); 
         }
         if(opcao === 'knight'){
-            tutorialFunctions.tutorialKnight({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
+            tutorialFunctions.tutorialKnight({row: 5, col: 2}, {row: 3, col: 3},{row: 0, col: 4},
+            {row: 1, col: 5}, //p1
+            {row: 5, col: 3}, //p2
+            {row: 1, col: 3}, //p3
+            {row: 4, col: 3}, //p4
+            {row: 1, col: 4}, //p5
+            {row: 4, col: 4}, //p6
+              board); 
         }
         if(opcao === 'queen'){
-            tutorialFunctions.tutorialQueen({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 
+            tutorialFunctions.tutorialQueen({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, 
+              
+              board); 
         }
         if(opcao === 'king'){
             tutorialFunctions.tutorialKing({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, board); 

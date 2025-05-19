@@ -1,6 +1,7 @@
 import { Piece, MoveContext } from './Piece';
 import { Position, Board, PieceColor } from '../types';
 
+
 export class King extends Piece {
   constructor(color: PieceColor, position: Position) {
     super('king', color, position, false);
@@ -12,7 +13,7 @@ export class King extends Piece {
 
     // Movimento normal do rei
     if (rowDiff <= 1 && colDiff <= 1) {
-      return true;
+        return true
     }
 
     // Roque
