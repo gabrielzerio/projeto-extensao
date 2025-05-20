@@ -45,7 +45,8 @@ let selectedPosition: Position | null = null;
 let currentColorTurn: PieceColor = "black";
 let enPassantTarget: EnPassantTarget | null = null;
 let posicoesProibidas: Position[] = []; // posições que não podem ser ocupadas por peças em tutorial
-
+let tipoPermitido: PieceType | null = null; // tipo de peça permitido em tutorial
+let opcao: string = "";
 
 // Funções do jogo
 function initializeBoard(): void {
@@ -110,6 +111,11 @@ async function handleSquareClick(row: number, col: number): Promise<void> {
       frontFunctions.removeHighlight();
     }
   } else if (piece && piece.color === currentColorTurn) {
+        if (tipoPermitido && piece.type !== tipoPermitido) {
+      const moveInfo = document.getElementById("move-info");
+      if (moveInfo) moveInfo.textContent = `Só é permitido mover a peça: ${opcao.toUpperCase()}!`;
+      return;
+    }
     selectedPiece = piece;
     selectedPosition = { row, col };
     const moveInfo = document.getElementById("move-info");
@@ -123,6 +129,10 @@ async function movePiece(piece: Piece, from: Position, to: Position): Promise<bo
     if (posicoesProibidas.some(pos => pos.row === to.row && pos.col === to.col)) {
     const moveInfo = document.getElementById('move-info');
     if (moveInfo) moveInfo.textContent = "Movimento proibido para esta casa!";
+    return false;
+  }
+    if (tipoPermitido && piece.type !== tipoPermitido) {
+    const moveInfo = document.getElementById('move-info');
     return false;
   }
   try {
@@ -267,7 +277,6 @@ window.onload = async () => {
   createBoard();
   const urlParams = new URLSearchParams(window.location.search);
   const mode = urlParams.get('mode');
-  let opcao;
   
     if(mode==='default'){
       frontFunctions.showPlayersName(player1Name, player2Name);
@@ -279,6 +288,7 @@ window.onload = async () => {
       opcao = await frontFunctions.showTutorial();
       const tutorialUtils = new TutorialUtils();
       const mensagem = tutorialUtils.mensagemTutorial(opcao); 
+      tipoPermitido = opcao as PieceType;
       mostrarPopup(mensagem);
        if(opcao === 'pawn'){  
         posicoesProibidas = [
