@@ -161,6 +161,18 @@ class FunctionsTutorial {
         const blackPawn = PieceFactory.createPiece('pawn', 'black', blackPositions);
         board[blackPositions.row][blackPositions.col] = blackPawn;
     }
+
+
+    locationVerification(piece: Position, board: Board ): void {
+        const pieceAtPosition = board[piece.row][piece.col];
+        if (pieceAtPosition instanceof Piece) {
+            console.log(`Piece at ${piece.row}, ${piece.col}: ${pieceAtPosition.type} (${pieceAtPosition.color})`);
+        } else {
+            console.log(`No piece at ${piece.row}, ${piece.col}`);
+        }
+    }
+
+
 }
 
 export default FunctionsTutorial;

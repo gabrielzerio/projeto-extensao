@@ -44,6 +44,8 @@ let selectedPiece: Piece | null = null;
 let selectedPosition: Position | null = null;
 let currentColorTurn: PieceColor = "black";
 let enPassantTarget: EnPassantTarget | null = null;
+let posicoesProibidas: Position[] = []; // posições que não podem ser ocupadas por peças em tutorial
+
 
 // Funções do jogo
 function initializeBoard(): void {
@@ -118,6 +120,11 @@ async function handleSquareClick(row: number, col: number): Promise<void> {
 }
 
 async function movePiece(piece: Piece, from: Position, to: Position): Promise<boolean> {
+    if (posicoesProibidas.some(pos => pos.row === to.row && pos.col === to.col)) {
+    const moveInfo = document.getElementById('move-info');
+    if (moveInfo) moveInfo.textContent = "Movimento proibido para esta casa!";
+    return false;
+  }
   try {
     const originalPiece = board[to.row][to.col];
     const context: any = { enPassantTarget };
@@ -273,7 +280,10 @@ window.onload = async () => {
       const tutorialUtils = new TutorialUtils();
       const mensagem = tutorialUtils.mensagemTutorial(opcao); 
       mostrarPopup(mensagem);
-       if(opcao === 'pawn'){
+       if(opcao === 'pawn'){  
+        posicoesProibidas = [
+              {row: 1, col: 4},
+            ];
           tutorialFunctions.tutorialPawn({row: 1, col: 4}, {row: 6, col: 3}, {row: 1, col: 2},{row: 7, col: 3}, board);
           console.log(board);          
        }
@@ -303,6 +313,7 @@ window.onload = async () => {
             {row: 1, col: 4}, //p5
             {row: 4, col: 4}, //p6
               board); 
+
         }
         if(opcao === 'queen'){
             tutorialFunctions.tutorialQueen({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, 
