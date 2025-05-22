@@ -172,7 +172,6 @@ class FunctionsTutorial {
         }
     }
 
-
 }
 
 export default FunctionsTutorial;

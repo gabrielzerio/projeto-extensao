@@ -10,8 +10,14 @@ import FunctionsTutorial from "./tutorial.js";
 import TutorialUtils from './utils/tutorialmsgUtils';
 import { mostrarPopup } from './popUp/popupUtils';
 
+
 const frontFunctions = new FunctionsFront();
+
+//Constantes para tutorial
 const tutorialFunctions = new FunctionsTutorial;
+const urlParams = new URLSearchParams(window.location.search);
+const mode = urlParams.get('mode');
+
 // Estado do jogo
 const board: Board = Array(8).fill(null).map(() => Array(8).fill(null));
 
@@ -157,6 +163,10 @@ async function movePiece(piece: Piece, from: Position, to: Position): Promise<bo
       }
       
       movePieceAnimation(to, from);
+
+  if (mode === 'tutorial') {
+    verificarReiCapturado()
+  }
       return true;
     }
   } catch (error) {
@@ -270,14 +280,30 @@ function showAlerts(): void {
     }
   }
 }
-
+//apenas para tutorial
+function verificarReiCapturado(): void {
+  // Procura o rei preto em todas as casas do tabuleiro
+  let reiPreto: King | null = null;
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = board[row][col];
+      if (piece instanceof King && piece.color === "black") {
+        reiPreto = piece;
+        break;
+      }
+    }
+    if (reiPreto) break;
+  }
+  if (!reiPreto) {
+    alert("Rei preto capturado! Você venceu!");
+  }
+  console.log(board);
+}
 toggleTurn();
 
 window.onload = async () => {
   createBoard();
-  const urlParams = new URLSearchParams(window.location.search);
-  const mode = urlParams.get('mode');
-  
+
     if(mode==='default'){
       frontFunctions.showPlayersName(player1Name, player2Name);
       initializeBoard();
