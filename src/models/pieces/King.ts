@@ -1,6 +1,8 @@
 import { Piece, MoveContext } from './Piece';
 import { Position, Board, PieceColor } from '../types';
 
+const urlParams = new URLSearchParams(window.location.search);
+const mode = urlParams.get('mode');
 
 export class King extends Piece {
   constructor(color: PieceColor, position: Position) {
@@ -10,7 +12,7 @@ export class King extends Piece {
   protected isValidPattern(from: Position, to: Position, board: Board, context: MoveContext = {}): boolean {
     const rowDiff = Math.abs(to.row - from.row);
     const colDiff = Math.abs(to.col - from.col);
-
+   
     // Movimento normal do rei
     if (rowDiff <= 1 && colDiff <= 1) {
         return true
@@ -25,6 +27,7 @@ export class King extends Piece {
   }
 
   isValidMove(from: Position, to: Position, board: Board, context: MoveContext = {}): boolean {
+
     if (!this.isValidPattern(from, to, board, context)) {
       return false;
     }
@@ -80,6 +83,7 @@ export class King extends Piece {
   }
 
   static isCheckmate(king: King, pieces: Piece[], board: Board): boolean {
+    
     if (!king.isInCheck(board)) {
       return false;
     }
@@ -92,6 +96,7 @@ export class King extends Piece {
         for (let r = 0; r < 8; r++) {
           for (let c = 0; c < 8; c++) {
             if (piece.isValidMove({ row, col }, { row: r, col: c }, board)) {
+       
               const originalPiece = board[r][c];
               const originalPosition = { ...piece.position };
 

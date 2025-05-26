@@ -140,10 +140,6 @@ async function movePiece(piece: Piece, from: Position, to: Position): Promise<bo
     if (moveInfo) moveInfo.textContent = "Movimento proibido para esta casa!";
     return false;
   }
-    if (tipoPermitido && piece.type !== tipoPermitido) {
-    const moveInfo = document.getElementById('move-info');
-    return false;
-  }
   try {
     const originalPiece = board[to.row][to.col];
     const context: any = { enPassantTarget };
@@ -167,9 +163,12 @@ async function movePiece(piece: Piece, from: Position, to: Position): Promise<bo
       
       movePieceAnimation(to, from);
 
-  if (mode === 'tutorial' && opcao === 'pawn' || opcao === 'bishop' ) {
+  if (mode === 'tutorial' && opcao === 'pawn' || opcao === 'bishop' || opcao === 'knight') {
     verificarReiCapturado(); 
   }   
+  if (mode === 'tutorial' && opcao === 'queen' || opcao === 'rook') {
+    existePeaoPretoNoTabuleiro();
+  }
       return true;
     }
   } catch (error) {
@@ -305,20 +304,20 @@ function verificarReiCapturado(): void {
 
 }
 
-function verificarPeaoCapturado(): void {
-      let pawnBlack: Pawn | null = null;
+function existePeaoPretoNoTabuleiro(): void {
+  let blackPawn: Pawn | null = null;
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
       const piece = board[row][col];
       if (piece instanceof Pawn && piece.color === "black") {
-        pawnBlack = piece;
+        blackPawn = piece;
         break;
       }
     }
-    if (pawnBlack) break;
-    if (!pawnBlack) {
-      mostrarPopupFinal(mensagemFinal(opcao));
-    }
+     if (blackPawn) break;
+  }
+  if (!blackPawn) {
+    mostrarPopupFinal(mensagemFinal(opcao));
   }
 }
 
@@ -357,9 +356,12 @@ window.onload = async () => {
              board); 
        }
         if(opcao === 'rook'){
-            tutorialFunctions.tutorialRook({row: 0, col: 4}, {row: 4, col: 4}, {row: 7, col: 4}, 
+            tutorialFunctions.tutorialRook(
+              {row: 0, col: 4}, 
+              {row: 4, col: 4},  {row: 7, col: 1}, 
               {row: 4, col: 0}, //p1
               {row: 4, col: 7}, //p2
+              {row: 7, col: 4},
               board); 
         }
         if(opcao === 'knight'){
@@ -374,7 +376,7 @@ window.onload = async () => {
 
         }
         if(opcao === 'queen'){
-            tutorialFunctions.tutorialQueen({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, 
+            tutorialFunctions.tutorialQueen({row: 1, col: 2},{row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4}, 
               
               board); 
         }
