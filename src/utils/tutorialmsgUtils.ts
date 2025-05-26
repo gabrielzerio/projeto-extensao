@@ -22,6 +22,30 @@ class TutorialUtils {
                 return `Tutorial não encontrado.`;
         }
     }
+    mensagemFinal(type: string): string {
+        switch (type) {
+            case "pawn":
+                return `Parabéns, comandante! Você dominou o Peão, a base do exército. 
+                Continue avançando e conquistando o tabuleiro!`;
+            case "knight":
+                return `Excelente trabalho! O Cavalo é uma peça poderosa e versátil. 
+                Use sua habilidade para surpreender o inimigo!`;
+            case "bishop":
+                return `Bom trabalho! O Bispo é um aliado valioso. 
+                Continue jogando com estratégia e você será imbatível!`;
+            case "rook":
+                return `Torre: A torre é uma peça forte e confiável. 
+                Use-a para controlar as linhas do tabuleiro!`;
+            case "queen":
+                return `Rainha: A rainha é a peça mais poderosa do jogo. 
+                Use-a sabiamente para dominar o campo de batalha!`;
+            case "king":
+                return `Rei: O rei é a peça mais importante do jogo. 
+                Proteja-o a todo custo e conduza seu exército à vitória!`;
+            default:
+                return `Mensagem final não encontrada.`;
+        }
+    }
 }
 
 export default TutorialUtils;

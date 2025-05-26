@@ -9,6 +9,7 @@ import FunctionsFront from "./utils/frontUtils.js";
 import FunctionsTutorial from "./tutorial.js";
 import TutorialUtils from './utils/tutorialmsgUtils';
 import { mostrarPopup } from './popUp/popupUtils';
+import { mostrarPopupFinal } from './popUp/popupUtils';
 
 
 const frontFunctions = new FunctionsFront();
@@ -295,7 +296,7 @@ function verificarReiCapturado(): void {
     if (reiPreto) break;
   }
   if (!reiPreto) {
-    alert("Rei preto capturado! Você venceu!");
+   mostrarPopupFinal('parabens volte ao menu inicial para jogar novamente!');
   }
   console.log(board);
 }

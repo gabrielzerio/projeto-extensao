@@ -6,7 +6,7 @@ interface PopupProps {
   mensagem: string; 
 }
 
-const Popup: React.FC<PopupProps> = ({ visible, onClose, mensagem }) => {
+const PopupFinal: React.FC<PopupProps> = ({ visible, onClose, mensagem }) => {
   if (!visible) return null;
 
   return (
@@ -53,24 +53,6 @@ const Popup: React.FC<PopupProps> = ({ visible, onClose, mensagem }) => {
         </p>
           
         <button
-          id="voltar"
-          style={{
-            position: "absolute",
-            bottom: "10px",
-            left: "30px",
-            backgroundColor: "transparent",
-            border: "none",
-          }}
-          onClick={() => window.location.reload()}
-        >
-          <img
-            src="/imgs/setaesquerda.png" 
-            alt="voltar"
-            style={{ width: "120px", height: "70px" }}
-          />
-        </button>
-
-        <button
           id="avancar"
           style={{
             position: "absolute",
@@ -80,13 +62,10 @@ const Popup: React.FC<PopupProps> = ({ visible, onClose, mensagem }) => {
             backgroundColor: "transparent",
             border: "none",
           }}
-           onClick={onClose}
+           onClick={() => window.location.reload()} 
+           
         >
-          <img
-            src="/imgs/setadireita.png"
-            alt="avancar"
-            style={{ width: "120px", height: "70px" }}
-          />
+            voltar ao menu tutorial
         </button>
 
         <div
@@ -114,4 +93,4 @@ const Popup: React.FC<PopupProps> = ({ visible, onClose, mensagem }) => {
   );
 };
 
-export default Popup;
+export default PopupFinal;
