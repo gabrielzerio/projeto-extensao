@@ -1,8 +1,7 @@
 import { Piece, MoveContext } from './Piece';
 import { Position, Board, PieceColor } from '../types';
 
-const urlParams = new URLSearchParams(window.location.search);
-const mode = urlParams.get('mode');
+
 
 export class King extends Piece {
   constructor(color: PieceColor, position: Position) {

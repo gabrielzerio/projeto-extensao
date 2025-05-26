@@ -1,6 +1,7 @@
 import { Position, Board, PieceType, PieceColor } from '../types';
 import { King } from './King';
-
+const urlParams = new URLSearchParams(window.location.search);
+const mode = urlParams.get('mode');
 /**
  * Contexto especial para movimentos, como en passant.
  */
@@ -45,8 +46,13 @@ export abstract class Piece {
    */
   protected isMoveSafe(from: Position, to: Position, board: Board): boolean {
     const targetPiece = board[to.row][to.col];
-    if (targetPiece && targetPiece.color === this.color) {
+    
+      
+    
+    if (targetPiece && targetPiece.color === this.color && mode != 'tutorial') {
       return false;
+    }else if(mode === 'tutorial') {
+      return true;
     }
 
     const king = this.findKing(this.color, board);
