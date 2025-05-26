@@ -18,6 +18,8 @@ const frontFunctions = new FunctionsFront();
 const tutorialFunctions = new FunctionsTutorial;
 const urlParams = new URLSearchParams(window.location.search);
 const mode = urlParams.get('mode');
+const tutorialUtils = new TutorialUtils();
+const mensagemFinal = tutorialUtils.mensagemFinal
 
 // Estado do jogo
 const board: Board = Array(8).fill(null).map(() => Array(8).fill(null));
@@ -296,7 +298,7 @@ function verificarReiCapturado(): void {
     if (reiPreto) break;
   }
   if (!reiPreto) {
-   mostrarPopupFinal('parabens volte ao menu inicial para jogar novamente!');
+   mostrarPopupFinal(mensagemFinal(opcao));
   }
   console.log(board);
 }
@@ -312,8 +314,7 @@ window.onload = async () => {
     }
     else if(mode === 'tutorial'){
       
-      opcao = await frontFunctions.showTutorial();
-      const tutorialUtils = new TutorialUtils();
+      opcao = await frontFunctions.showTutorial();   
       const mensagem = tutorialUtils.mensagemTutorial(opcao); 
       tipoPermitido = opcao as PieceType;
       mostrarPopup(mensagem);
