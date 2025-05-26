@@ -167,9 +167,9 @@ async function movePiece(piece: Piece, from: Position, to: Position): Promise<bo
       
       movePieceAnimation(to, from);
 
-  if (mode === 'tutorial') {
-    verificarReiCapturado()
-  }
+  if (mode === 'tutorial' && opcao === 'pawn' || opcao === 'bishop' ) {
+    verificarReiCapturado(); 
+  }   
       return true;
     }
   } catch (error) {
@@ -283,7 +283,9 @@ function showAlerts(): void {
     }
   }
 }
-//apenas para tutorial
+/////////////////////////////////////////////////////apenas para tutorial///////////////////////////////////////////////////
+/////////////////////////////////////////////////////only for tutorial///////////////////////////////////////////////////
+
 function verificarReiCapturado(): void {
   // Procura o rei preto em todas as casas do tabuleiro
   let reiPreto: King | null = null;
@@ -300,8 +302,26 @@ function verificarReiCapturado(): void {
   if (!reiPreto) {
    mostrarPopupFinal(mensagemFinal(opcao));
   }
-  console.log(board);
+
 }
+
+function verificarPeaoCapturado(): void {
+      let pawnBlack: Pawn | null = null;
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = board[row][col];
+      if (piece instanceof Pawn && piece.color === "black") {
+        pawnBlack = piece;
+        break;
+      }
+    }
+    if (pawnBlack) break;
+    if (!pawnBlack) {
+      mostrarPopupFinal(mensagemFinal(opcao));
+    }
+  }
+}
+
 toggleTurn();
 
 window.onload = async () => {
@@ -322,9 +342,9 @@ window.onload = async () => {
         posicoesProibidas = [
               {row: 1, col: 4},
             ];
-          tutorialFunctions.tutorialPawn({row: 1, col: 4}, {row: 6, col: 3}, {row: 1, col: 2},{row: 7, col: 3}, board);
-          console.log(board);          
+          tutorialFunctions.tutorialPawn({row: 1, col: 4}, {row: 6, col: 3}, {row: 1, col: 2},{row: 7, col: 3}, board);     
        }
+
        if(opcao === 'bishop'){
           tutorialFunctions.tutorialBishop({row: 1, col: 6}, {row: 6, col: 4}, {row: 7, col: 4},
             {row: 0, col: 5}, //p1
